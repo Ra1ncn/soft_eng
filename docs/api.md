@@ -1,7 +1,7 @@
 # 第一阶段 API 约定
 
 本文件是 B、C、D 的接口标准，与 `shared/contracts.ts` 同步维护。
-当前 A 只实现 `GET /api/health`；下列四个业务接口**尚未实现**，现请求会落入统一 404。表中的权限、成功响应及业务错误是 B、C、D 的实现要求，不能视为已完成接口。
+Implemented so far: `GET /api/health` and `POST /api/quizzes`. The other three business endpoints are not built yet and return the shared 404.
 
 ## 通用规则
 
@@ -18,7 +18,7 @@
 | 方法与路径 | 负责人 | 允许身份 | 成功状态 | 共享响应 |
 | --- | --- | --- | --- | --- |
 | `GET /api/health` | A，已实现 | 无需身份 | 200 | `HealthResponse` |
-| `POST /api/quizzes` | B | TEACHER | 201 | `CreateQuizResponse` |
+| `POST /api/quizzes` | B, implemented | TEACHER | 201 | `CreateQuizResponse` |
 | `GET /api/quizzes` | C | STUDENT（老师返回 403） | 200 | `QuizListResponse` |
 | `GET /api/quizzes/:quizId` | C | STUDENT（老师返回 403） | 200 | `QuizDetailResponse` |
 | `POST /api/quizzes/:quizId/submissions` | D | STUDENT（老师返回 403） | 首次 201，重复 200 | `SubmitResponse` |

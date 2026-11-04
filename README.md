@@ -2,7 +2,7 @@
 
 React / TypeScript / Vite + Express / Zod + PostgreSQL / Prisma，使用 npm workspaces。A 提供平台基础、数据库和接口契约，方便 B、C、D 在同一仓库并行开发。
 
-当前只实现数据库健康检查及入口占位页。创建、列表、详情、提交四个业务接口均为空路由，目前返回统一 404，约定见 [docs/api.md](docs/api.md)。没有登录、评分、截止时间、发布状态、访问码或 AI 功能。
+Implemented so far: the database health check, the home and student placeholder pages, and quiz creation (the `/teacher` page and `POST /api/quizzes`). The list, detail, and submission endpoints are still empty and return the shared 404; see [docs/api.md](docs/api.md). There is no login, grading, deadline, publication state, access code, or AI feature yet.
 
 ## 环境与首次启动
 

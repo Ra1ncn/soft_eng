@@ -1,6 +1,6 @@
 import type { SVGProps } from "react";
 
-export type IconName = "arrow" | "check" | "alert" | "error" | "info" | "book" | "layers" | "spark";
+export type IconName = "arrow" | "check" | "alert" | "error" | "info" | "book" | "layers" | "spark" | "plus" | "trash";
 const paths: Record<IconName, string> = {
   arrow: "M4 12h15m-6-6 6 6-6 6",
   check: "m5 12 4 4L19 6",
@@ -10,6 +10,8 @@ const paths: Record<IconName, string> = {
   book: "M3 4h6a3 3 0 0 1 3 3v14a4 4 0 0 0-4-3H3V4Zm18 0h-6a3 3 0 0 0-3 3v14a4 4 0 0 1 4-3h5V4Z",
   layers: "m12 3 10 5-10 5L2 8l10-5ZM2 12l10 5 10-5M2 16l10 5 10-5",
   spark: "m12 2 2.8 7.2L22 12l-7.2 2.8L12 22l-2.8-7.2L2 12l7.2-2.8L12 2Z",
+  plus: "M12 5v14M5 12h14",
+  trash: "M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5",
 };
 // 原创基础几何线条，无外部图形资源。
 export function Icon({ name, ...props }: SVGProps<SVGSVGElement> & { name: IconName }) {
