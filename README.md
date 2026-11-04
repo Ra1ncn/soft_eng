@@ -11,8 +11,8 @@ React / TypeScript / Vite + Express / Zod + PostgreSQL / Prisma，使用 npm wor
 ```bash
 git clone https://github.com/Ra1ncn/soft_eng.git
 cd soft_eng
-# PR 合并前请切换此分支；合并后从 main 开始。
-git switch chore/phase1-foundation
+# 基础和主题合并后，组员统一从 main 开始。
+git switch main
 nvm install
 nvm use
 npm ci
@@ -97,8 +97,12 @@ schema 变更统一请 A 完成或 review。拉取最新 main 后再生成新 mi
 - **C**：在 `client/src/pages/student/` 完成列表和作答页；在 quizzes 路由添加 GET `/`、GET `/:quizId`。只允许 STUDENT；显式 select 不含 isCorrect，按 position 排序。
 - **D**：在 submissions 路由添加 POST `/`，`req.params.quizId` 来自 mergeParams。只允许 STUDENT；验证归属、重复和单选限制，在事务中存所有题的答案（含未答），处理提交唯一约束并返回原有记录；接入提交成功状态。
 
-三位先各自从 foundation（PR 合并后从 main）创建功能分支，不在共享工作分支同时提交。C 可先用 docs 中的固定 ID 写 mock，D 可基于 seed 测试事务。共享契约或 schema 修改请与 A 对齐。另需组长邀请余下成员、设置 main 保护、分配 PR review，并让至少一位组员从零实际启动；这些人工验收尚不能由 A 代替。
+三位各自从最新 main 创建功能分支，不在共享工作分支同时提交。C 可先用 docs 中的固定 ID 写 mock，D 可基于 seed 测试事务。共享契约或 schema 修改请与 A 对齐。另需组长邀请余下成员、设置 main 保护、分配 PR review，并让至少一位组员从零实际启动；这些人工验收尚不能由 A 代替。
 
 ## 实际验证与附件修正
 
 完整命令、实际结果、版本、局限及附件修正见 [docs/validation.md](docs/validation.md)。附件原稿备份位于 [docs/reference/A_Task_Guide_ZH.md](docs/reference/A_Task_Guide_ZH.md)，它是未运行草稿；冲突时以本次用户要求及最终接口契约为准。
+
+## 前端视觉系统
+
+统一主题、组件接口、B/C 使用示例和实际验证见 [docs/ui-theme.md](docs/ui-theme.md)。运行前端后访问 `/ui-preview` 查看所有组件、表单及状态。界面默认使用英文，字体通过 Fontsource 自托管。

@@ -1,0 +1,11 @@
+.field { display: grid; gap: var(--space-2); min-width: 0; }
+.label { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-3); color: var(--color-text); font-weight: 600; }
+.required { color: var(--color-text-muted); font-size: 12px; font-weight: 400; }
+.control { width: 100%; min-width: 0; min-height: 48px; padding: 11px 14px; background: var(--color-surface-soft); color: var(--color-text); border: 1px solid var(--color-text-muted); border-radius: var(--radius-control); }
+.control::placeholder { color: var(--color-text-muted); opacity: 1; }
+.control[aria-invalid="true"] { border: 2px solid var(--color-error); }
+.control:disabled { background: var(--color-page); color: var(--color-dark); border-color: var(--color-secondary-edge); cursor: not-allowed; }
+.textarea { resize: vertical; }
+.hint, .error { font-size: 14px; }
+.hint { color: var(--color-text-muted); }
+.error { color: var(--color-error); }

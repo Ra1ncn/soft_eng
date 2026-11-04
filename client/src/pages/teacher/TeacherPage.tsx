@@ -1,6 +1,8 @@
-import { Link } from "react-router";
+import { ButtonLink, Card, Icon, StatusBadge } from "../../components/ui/index.ts";
+import styles from "../EntryPage.module.css";
 
 export function TeacherPage() {
-  return <><Link to="/">← 返回首页</Link><h1>教师入口</h1><p>入口占位，由 B 继续开发创建 quiz 的页面和接口。</p>
-    <p className="muted">这是演示身份，接入真实登录时必须删除。</p></>;
+  return <><header className={styles.header}><p className={styles.eyebrow}>Teacher space</p><h1>Make room for<br />a good question.</h1><p className={styles.lead}>A thoughtful quiz begins with an idea worth sharing.</p></header>
+    <Card className={styles.panel}><span className={styles.symbol}><Icon name="layers" /></span><div className={styles.copy}><h2>Your next quiz starts here.</h2><p>This space is being prepared for creating and saving quizzes. Team B will continue building the teacher experience.</p><ButtonLink to="/" variant="secondary">Back to home</ButtonLink></div><StatusBadge status="neutral">Coming together</StatusBadge></Card>
+    <p className={styles.detail}>Demo space · Real sign-in is not connected yet.</p></>;
 }

@@ -1,6 +1,8 @@
-import { Link } from "react-router";
+import { ButtonLink, Card, Icon, StatusBadge } from "../../components/ui/index.ts";
+import styles from "../EntryPage.module.css";
 
 export function StudentPage() {
-  return <><Link to="/">← 返回首页</Link><h1>学生入口</h1><p>入口占位，由 C 继续开发查看和作答页面，由 D 接入提交成功状态。</p>
-    <p className="muted">这是演示身份，接入真实登录时必须删除。</p></>;
+  return <><header className={styles.header}><p className={styles.eyebrow}>Student space</p><h1>A fresh question.<br />A new perspective.</h1><p className={styles.lead}>Take your time. There is always something new to discover.</p></header>
+    <Card className={styles.panel}><span className={styles.symbol}><Icon name="book" /></span><div className={styles.copy}><h2>A place for your curiosity.</h2><p>This space is being prepared for exploring and answering quizzes. Team C will build the student experience, with submissions connected by Team D.</p><ButtonLink to="/" variant="secondary">Back to home</ButtonLink></div><StatusBadge status="neutral">Coming together</StatusBadge></Card>
+    <p className={styles.detail}>Demo space · Real sign-in is not connected yet.</p></>;
 }
