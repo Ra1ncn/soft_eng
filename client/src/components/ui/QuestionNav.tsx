@@ -1,3 +1,4 @@
+import { scrollAndFocus } from "../../lib/scrollAndFocus.ts";
 import styles from "./QuestionNav.module.css";
 
 // targetId must belong to an element with tabIndex={-1}, so focus can move there too.
@@ -5,10 +6,7 @@ export type QuestionNavItem = { targetId: string; hasError?: boolean };
 
 function goTo(targetId: string) {
   const target = document.getElementById(targetId);
-  if (!target) return;
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-  target.focus({ preventScroll: true });
+  if (target) scrollAndFocus(target);
 }
 
 export function QuestionNav({ items }: { items: QuestionNavItem[] }) {

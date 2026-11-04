@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { CreateQuizRequest, CreateQuizResponse, QuestionType } from "@quiz/shared";
 import { AnswerOption, Button, ButtonLink, Card, Icon, QuestionNav, Select, StatusBadge, TextInput, Textarea, type SelectOption } from "../../components/ui/index.ts";
 import { apiFetch, ApiFetchError } from "../../lib/apiFetch.ts";
+import { scrollAndFocus } from "../../lib/scrollAndFocus.ts";
 import entryStyles from "../EntryPage.module.css";
 import styles from "./TeacherPage.module.css";
 import {
@@ -49,7 +50,7 @@ function QuestionCard({ question, index, canRemove, errors, onChange }: Question
           <Button className={`${styles.iconButton} ${styles.removeOption}`} variant="secondary" disabled={question.options.length <= MIN_OPTIONS} aria-label={`Remove option ${optionNumber} from question ${number}`} onClick={() => onChange((draft) => removeOption(draft, question.key, option.key))}><Icon name="trash" className={styles.removeIcon} /></Button>
         </div>;
       })}
-      {optionsError && <p id={optionsErrorId} className={styles.error}>{optionsError}</p>}
+      {optionsError && <p id={optionsErrorId} className={styles.error} tabIndex={-1} data-field-error>{optionsError}</p>}
       <div className={styles.optionActions}>
         <Button variant="secondary" onClick={() => onChange((draft) => addOption(draft, question.key))}><Icon name="plus" /> Add option</Button>
         <Select aria-label={`Type of question ${number}`} value={question.type} options={questionTypes} onChange={(type) => onChange((draft) => setQuestionType(draft, question.key, type))} />
@@ -65,6 +66,15 @@ export function TeacherPage() {
   const [serverErrors, setServerErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState("");
   const [saved, setSaved] = useState<CreateQuizResponse | null>(null);
+  const [errorJumps, setErrorJumps] = useState(0);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Runs after the errors render, because the first invalid field is found in the DOM.
+  useEffect(() => {
+    if (errorJumps === 0) return;
+    const firstError = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"], [data-field-error]');
+    if (firstError) scrollAndFocus(firstError, "center");
+  }, [errorJumps]);
 
   // Errors come from the current draft, so removing a question can never leave one on the wrong row.
   const errors = { ...serverErrors, ...(attempted ? validateDraft(draft) : {}) };
@@ -88,13 +98,18 @@ export function TeacherPage() {
     setAttempted(true);
     setServerErrors({});
     setFormError("");
-    if (Object.keys(validateDraft(draft)).length > 0) return;
+    if (Object.keys(validateDraft(draft)).length > 0) {
+      setErrorJumps((count) => count + 1);
+      return;
+    }
     setSaving(true);
     try {
       setSaved(await saveQuiz(toCreateRequest(draft)));
     } catch (error) {
-      if (error instanceof ApiFetchError && error.error.fields) setServerErrors(describeFields(Object.keys(error.error.fields), draft));
-      else if (error instanceof ApiFetchError) setFormError("We couldn’t save your quiz. Your work is still here, so please try again.");
+      if (error instanceof ApiFetchError && error.error.fields) {
+        setServerErrors(describeFields(Object.keys(error.error.fields), draft));
+        setErrorJumps((count) => count + 1);
+      } else if (error instanceof ApiFetchError) setFormError("We couldn’t save your quiz. Your work is still here, so please try again.");
       else setFormError("We couldn’t reach the server. Your work is still here, so please try again.");
     } finally {
       setSaving(false);
@@ -127,7 +142,7 @@ export function TeacherPage() {
   return <>{header("Create a quiz.", "Add your questions, mark the correct answers, and save when you’re ready.")}
     <div className={styles.layout}>
     <QuestionNav items={draft.questions.map((question, index) => ({ targetId: questionTargetId(question), hasError: questionHasError(errors, index) }))} />
-    <form className={styles.form} onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} className={styles.form} onSubmit={handleSubmit} noValidate>
       <Card>
         <TextInput label="Quiz title" required placeholder="Give your quiz a name" value={draft.title} error={errors.title} onChange={(event) => { const title = event.target.value; change((current) => ({ ...current, title })); }} />
       </Card>
