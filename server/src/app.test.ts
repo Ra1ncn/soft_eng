@@ -41,8 +41,8 @@ it("未知 API 路由返回统一 404", async () => {
   expect(response.status).toBe(404); expect(response.body.error.code).toBe("NOT_FOUND");
   expect(console.error).not.toHaveBeenCalled();
 });
-it("四个业务接口保持未实现", async () => {
-  for (const [method, path] of [["post", "/api/quizzes"], ["get", "/api/quizzes"], ["get", "/api/quizzes/quiz-demo"], ["post", "/api/quizzes/quiz-demo/submissions"]] as const) {
+it("business endpoints not built yet stay unimplemented", async () => {
+  for (const [method, path] of [["get", "/api/quizzes"], ["get", "/api/quizzes/quiz-demo"], ["post", "/api/quizzes/quiz-demo/submissions"]] as const) {
     expect((await request(app)[method](path)).status).toBe(404);
   }
 });

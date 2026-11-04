@@ -2,7 +2,7 @@
 
 React / TypeScript / Vite + Express / Zod + PostgreSQL / Prisma，使用 npm workspaces。A 提供平台基础、数据库和接口契约，方便 B、C、D 在同一仓库并行开发。
 
-当前只实现数据库健康检查及入口占位页。创建、列表、详情、提交四个业务接口均为空路由，目前返回统一 404，约定见 [docs/api.md](docs/api.md)。没有登录、评分、截止时间、发布状态、访问码或 AI 功能。
+Implemented so far: the database health check, the home and student placeholder pages, and quiz creation (the `/teacher` page and `POST /api/quizzes`). The list, detail, and submission endpoints are still empty and return the shared 404; see [docs/api.md](docs/api.md). There is no login, grading, deadline, publication state, access code, or AI feature yet.
 
 ## 环境与首次启动
 
@@ -46,10 +46,12 @@ Prisma Studio 打开其终端给出的地址，选择 `Quiz` 表并筛选 `id = 
 ## 目录与公共基础
 
 ```text
-client/src/pages/teacher/           B：教师页面占位
+client/src/pages/teacher/           B: quiz creation page (done)
 client/src/pages/student/           C：学生页面占位；D：提交成功状态
 client/src/lib/apiFetch.ts          演示身份请求封装
-server/src/modules/quizzes/         B：创建接口；C：列表和详情（空路由）
+client/src/lib/scrollAndFocus.ts    Shared scroll-and-focus helper
+client/src/main.tsx                 Routes (data router; add new pages here)
+server/src/modules/quizzes/         B: create endpoint (done); C: list and detail (not built yet)
 server/src/modules/submissions/     D：提交接口（空路由，mergeParams 已启用）
 server/src/auth/getCurrentUser.ts   从 X-Demo-Role 获取 seed 用户
 server/src/lib/prisma.ts            Prisma Client 单例
@@ -99,7 +101,8 @@ schema 变更统一请 A 完成或 review。拉取最新 main 后再生成新 mi
 
 ## B、C、D 接手
 
-- **B**：在 `client/src/pages/teacher/` 完成创建页；在 quizzes 路由添加 POST `/`。使用 TEACHER、共享请求校验，服务端按数组生成 position，并保存正确答案。
+- **B** (done): the `/teacher` page creates quizzes through `POST /api/quizzes`. It stores position from array order and keeps the answer key on the server. Editing, publishing, and a teacher quiz list are not built yet.
+- **Tests**: when you build an endpoint, remove it from the "not built yet" list in `server/src/app.test.ts`.
 - **C**：在 `client/src/pages/student/` 完成列表和作答页；在 quizzes 路由添加 GET `/`、GET `/:quizId`。只允许 STUDENT；显式 select 不含 isCorrect，按 position 排序。
 - **D**：在 submissions 路由添加 POST `/`，`req.params.quizId` 来自 mergeParams。只允许 STUDENT；验证归属、重复和单选限制，在事务中存所有题的答案（含未答），处理提交唯一约束并返回原有记录；接入提交成功状态。
 
@@ -111,4 +114,4 @@ schema 变更统一请 A 完成或 review。拉取最新 main 后再生成新 mi
 
 ## 前端视觉系统
 
-统一主题、组件接口、B/C 使用示例和实际验证见 [docs/ui-theme.md](docs/ui-theme.md)。运行前端后访问 `/ui-preview` 查看所有组件、表单及状态。界面默认使用英文，字体通过 Fontsource 自托管。
+统一主题、组件接口、B/C 使用示例和实际验证见 [docs/ui-theme.md](docs/ui-theme.md)。运行前端后访问 `/ui-preview` 查看基础组件、表单及状态。`Select`, `QuestionNav`, and `ConfirmDialog` are not on that page yet; see them in use on `/teacher`.界面默认使用英文，字体通过 Fontsource 自托管。
