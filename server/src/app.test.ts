@@ -41,9 +41,14 @@ it("未知 API 路由返回统一 404", async () => {
   expect(response.status).toBe(404); expect(response.body.error.code).toBe("NOT_FOUND");
   expect(console.error).not.toHaveBeenCalled();
 });
-it("business endpoints not built yet stay unimplemented", async () => {
-  for (const [method, path] of [["get", "/api/quizzes"], ["get", "/api/quizzes/quiz-demo"], ["post", "/api/quizzes/quiz-demo/submissions"]] as const) {
-    expect((await request(app)[method](path)).status).toBe(404);
+it("D submission endpoint remains unimplemented", async () => {
+  expect((await request(app).post("/api/quizzes/quiz-demo/submissions")).status).toBe(404);
+});
+it("C read routes enforce the student role before querying", async () => {
+  for (const path of ["/api/quizzes", "/api/quizzes/quiz-demo"]) {
+    const response = await request(app).get(path);
+    expect(response.status).toBe(403);
+    expect(response.body.error.code).toBe("FORBIDDEN");
   }
 });
 it("Zod 字段错误使用点分路径", async () => {

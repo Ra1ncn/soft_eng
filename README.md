@@ -2,7 +2,7 @@
 
 React / TypeScript / Vite + Express / Zod + PostgreSQL / Prisma，使用 npm workspaces。A 提供平台基础、数据库和接口契约，方便 B、C、D 在同一仓库并行开发。
 
-Implemented so far: the database health check, the home and student placeholder pages, and quiz creation (the `/teacher` page and `POST /api/quizzes`). The list, detail, and submission endpoints are still empty and return the shared 404; see [docs/api.md](docs/api.md). There is no login, grading, deadline, publication state, access code, or AI feature yet.
+当前已实现 A 的数据库健康检查、B 的教师创建页面和创建接口，以及 C 的学生列表、作答页面和两个查询接口。学生端读取真实数据库，支持单选、多选、草稿和提交确认。B 的 PR #4 已合并，C 分支已同步最新 main 并保留其实现。D 的提交接口仍为空路由，返回统一 404；成功页面已按共享响应接好，真实提交持久化仍需 D 完成。接口约定见 [docs/api.md](docs/api.md)，C 的范围、操作与交接见 [docs/student.md](docs/student.md)。没有真实登录、评分、截止时间、发布状态、访问码或 AI 功能。
 
 ## 环境与首次启动
 
@@ -25,7 +25,7 @@ npm run dev
 
 `nvm` 是可选的 Node 版本管理器，未安装时自行安装匹配版本的 Node。依赖安装与复制 `.env` 后，所有 Prisma 命令都从**根目录**运行；无需进入 server。首次等待数据库就绪，可运行 `docker compose ps`（db 为 healthy）或 `docker compose up -d --wait`。迁移失败应先确认 Docker 和端口，不要删除数据卷。
 
-- 首页：<http://localhost:5173/>；教师入口：<http://localhost:5173/teacher>；学生入口：<http://localhost:5173/student>。
+- 首页：<http://localhost:5173/>；教师入口：<http://localhost:5173/teacher>；学生入口：<http://localhost:5173/student>；示例作答页：<http://localhost:5173/student/quizzes/quiz-demo>。
 - 后端：<http://localhost:3001/api/health>。Vite 把 `/api` 代理到后端；无需跨域配置。
 - `npm run dev` 同时运行前后端，Ctrl+C 停止两者。
 - 默认前端 5173、后端 3001、数据库 5432，均通过根目录 `.env` 配置。
@@ -46,12 +46,12 @@ Prisma Studio 打开其终端给出的地址，选择 `Quiz` 表并筛选 `id = 
 ## 目录与公共基础
 
 ```text
-client/src/pages/teacher/           B: quiz creation page (done)
-client/src/pages/student/           C：学生页面占位；D：提交成功状态
+client/src/pages/teacher/           B：教师创建页面已实现
+client/src/pages/student/           C：列表、搜索、作答、草稿、提交确认及成功/失败状态
 client/src/lib/apiFetch.ts          演示身份请求封装
-client/src/lib/scrollAndFocus.ts    Shared scroll-and-focus helper
-client/src/main.tsx                 Routes (data router; add new pages here)
-server/src/modules/quizzes/         B: create endpoint (done); C: list and detail (not built yet)
+client/src/lib/scrollAndFocus.ts    公共滚动和焦点工具
+client/src/main.tsx                Data Router；在此添加页面路由
+server/src/modules/quizzes/         B：创建接口；C：列表和详情，均已实现
 server/src/modules/submissions/     D：提交接口（空路由，mergeParams 已启用）
 server/src/auth/getCurrentUser.ts   从 X-Demo-Role 获取 seed 用户
 server/src/lib/prisma.ts            Prisma Client 单例
@@ -66,7 +66,7 @@ prisma.config.ts                   根目录 Prisma 路径与 seed 配置
 
 后端在 Express 5 异步路由中调用 `getCurrentUser(req)`，检查 user.role，不允许的角色抛出 `new AppError("FORBIDDEN", "身份没有权限")`。再使用 `CreateQuizRequest.parse(req.body)` 或 `SubmitRequest.parse(req.body)`；Zod 错误会转为 400，fields 使用点分路径。数据库错误只向客户端返回通用 500。500 的原始错误只写入服务端日志，不返回客户端；400、403、404 不写入错误日志。
 
-前端示例（供 B/C/D 接入业务页面，不代表接口已实现）：
+前端请求示例（各接口当前状态见 docs/api.md）：
 
 ```ts
 import type { QuizListResponse } from "@quiz/shared";
@@ -101,12 +101,13 @@ schema 变更统一请 A 完成或 review。拉取最新 main 后再生成新 mi
 
 ## B、C、D 接手
 
-- **B** (done): the `/teacher` page creates quizzes through `POST /api/quizzes`. It stores position from array order and keeps the answer key on the server. Editing, publishing, and a teacher quiz list are not built yet.
-- **Tests**: when you build an endpoint, remove it from the "not built yet" list in `server/src/app.test.ts`.
-- **C**：在 `client/src/pages/student/` 完成列表和作答页；在 quizzes 路由添加 GET `/`、GET `/:quizId`。只允许 STUDENT；显式 select 不含 isCorrect，按 position 排序。
-- **D**：在 submissions 路由添加 POST `/`，`req.params.quizId` 来自 mergeParams。只允许 STUDENT；验证归属、重复和单选限制，在事务中存所有题的答案（含未答），处理提交唯一约束并返回原有记录；接入提交成功状态。
+- **B**：已完成 `/teacher` 和 POST `/api/quizzes`，按数组顺序保存 position，正确答案保留在服务端。编辑、发布和教师测验列表尚未实现。
+- **C**：已完成 `client/src/pages/student/` 的列表、搜索和作答页，以及 quizzes 路由 GET `/`、GET `/:quizId`。只允许 STUDENT；显式 select 不含 isCorrect，按 position 排序。提交前后状态已就绪，真实保存等待 D；详见 [docs/student.md](docs/student.md)。
+- **D**：在 submissions 路由添加 POST `/`，`req.params.quizId` 来自 mergeParams。只允许 STUDENT；验证归属、重复和单选限制，在事务中存所有题的答案（含未答），处理提交唯一约束并返回原有记录；返回共享 `SubmitResponse` 即可驱动 C 已有的成功状态。
 
-三位各自从最新 main 创建功能分支，不在共享工作分支同时提交。C 可先用 docs 中的固定 ID 写 mock，D 可基于 seed 测试事务。共享契约或 schema 修改请与 A 对齐。另需组长邀请余下成员、设置 main 保护、分配 PR review，并让至少一位组员从零实际启动；这些人工验收尚不能由 A 代替。
+实现新接口时同步更新 `server/src/app.test.ts`，不再把已实现的接口列为返回 404 的占位路由。
+
+组员各自从最新 main 创建功能分支，不在共享工作分支同时提交。C 已用真实 seed 数据验证查询，并验证 B 创建的新测验可以读取和作答；D 可基于 seed 测试事务。共享契约或 schema 修改请与 A 对齐。另需组长邀请余下成员、设置 main 保护、分配 PR review，并让至少一位组员从零实际启动；这些人工验收尚不能由 A 代替。
 
 ## 实际验证与附件修正
 
