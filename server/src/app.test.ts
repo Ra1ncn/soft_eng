@@ -1,12 +1,18 @@
 import express from "express";
 import request from "supertest";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { CreateQuizRequest } from "@quiz/shared";
-import { errorHandler } from "./lib/errors.ts";
+import { AppError, errorHandler } from "./lib/errors.ts";
 const mocks = vi.hoisted(() => ({ query: vi.fn(), findQuiz: vi.fn() }));
 vi.mock("./lib/prisma.ts", () => ({ prisma: { $queryRaw: mocks.query, quiz: { findUnique: mocks.findQuiz } } }));
 import { app } from "./app.ts";
-beforeEach(() => { vi.resetAllMocks(); mocks.query.mockResolvedValue([{}]); mocks.findQuiz.mockResolvedValue({ id: "quiz-demo" }); });
+beforeEach(() => {
+  vi.resetAllMocks();
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  mocks.query.mockResolvedValue([{}]);
+  mocks.findQuiz.mockResolvedValue({ id: "quiz-demo" });
+});
+afterEach(() => vi.restoreAllMocks());
 it("health 无身份头也查询数据库", async () => {
   const response = await request(app).get("/api/health");
   expect(response.status).toBe(200);
@@ -14,10 +20,13 @@ it("health 无身份头也查询数据库", async () => {
   expect(mocks.query).toHaveBeenCalledOnce();
 });
 it("数据库故障只返回通用 500", async () => {
-  mocks.query.mockRejectedValue(new Error("secret database connection details"));
+  const originalError = new Error("secret database connection details");
+  mocks.query.mockRejectedValue(originalError);
   const response = await request(app).get("/api/health");
   expect(response.status).toBe(500);
   expect(response.body).toEqual({ error: { code: "INTERNAL_ERROR", message: "服务器内部错误" } });
+  expect(console.error).toHaveBeenCalledTimes(1);
+  expect(vi.mocked(console.error).mock.calls[0]?.[0]).toBe(originalError);
 });
 it("未 seed 时健康检查明确返回 false", async () => {
   mocks.findQuiz.mockResolvedValue(null);
@@ -30,6 +39,7 @@ it("非法 JSON 返回 400", async () => {
 it("未知 API 路由返回统一 404", async () => {
   const response = await request(app).get("/api/unknown");
   expect(response.status).toBe(404); expect(response.body.error.code).toBe("NOT_FOUND");
+  expect(console.error).not.toHaveBeenCalled();
 });
 it("四个业务接口保持未实现", async () => {
   for (const [method, path] of [["post", "/api/quizzes"], ["get", "/api/quizzes"], ["get", "/api/quizzes/quiz-demo"], ["post", "/api/quizzes/quiz-demo/submissions"]] as const) {
@@ -46,4 +56,14 @@ it("Zod 字段错误使用点分路径", async () => {
   ] }] });
   expect(response.status).toBe(400);
   expect(response.body.error.fields["questions.0.options"]).toBeDefined();
+});
+
+it.each([
+  ["VALIDATION_ERROR", 400], ["FORBIDDEN", 403], ["NOT_FOUND", 404],
+] as const)("预期 %s 错误不写服务端错误日志", async (code, status) => {
+  const testApp = express();
+  testApp.get("/error", () => { throw new AppError(code, "预期错误"); });
+  testApp.use(errorHandler);
+  expect((await request(testApp).get("/error")).status).toBe(status);
+  expect(console.error).not.toHaveBeenCalled();
 });
