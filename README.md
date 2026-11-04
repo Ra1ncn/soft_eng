@@ -11,8 +11,8 @@ React / TypeScript / Vite + Express / Zod + PostgreSQL / Prisma，使用 npm wor
 ```bash
 git clone https://github.com/Ra1ncn/soft_eng.git
 cd soft_eng
-# PR 合并前请切换此分支；合并后从 main 开始。
-git switch chore/phase1-foundation
+# 基础和主题合并后，组员统一从 main 开始。
+git switch main
 nvm install
 nvm use
 npm ci
@@ -97,7 +97,7 @@ schema 变更统一请 A 完成或 review。拉取最新 main 后再生成新 mi
 - **C**：在 `client/src/pages/student/` 完成列表和作答页；在 quizzes 路由添加 GET `/`、GET `/:quizId`。只允许 STUDENT；显式 select 不含 isCorrect，按 position 排序。
 - **D**：在 submissions 路由添加 POST `/`，`req.params.quizId` 来自 mergeParams。只允许 STUDENT；验证归属、重复和单选限制，在事务中存所有题的答案（含未答），处理提交唯一约束并返回原有记录；接入提交成功状态。
 
-三位先各自从 foundation（PR 合并后从 main）创建功能分支，不在共享工作分支同时提交。C 可先用 docs 中的固定 ID 写 mock，D 可基于 seed 测试事务。共享契约或 schema 修改请与 A 对齐。另需组长邀请余下成员、设置 main 保护、分配 PR review，并让至少一位组员从零实际启动；这些人工验收尚不能由 A 代替。
+三位各自从最新 main 创建功能分支，不在共享工作分支同时提交。C 可先用 docs 中的固定 ID 写 mock，D 可基于 seed 测试事务。共享契约或 schema 修改请与 A 对齐。另需组长邀请余下成员、设置 main 保护、分配 PR review，并让至少一位组员从零实际启动；这些人工验收尚不能由 A 代替。
 
 ## 实际验证与附件修正
 
