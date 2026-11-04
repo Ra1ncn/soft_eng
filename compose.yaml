@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:18.1-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?请从 .env.example 创建 .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?请配置本地数据库密码}
+      POSTGRES_DB: ${POSTGRES_DB:?请配置数据库名}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+volumes:
+  postgres_data:
