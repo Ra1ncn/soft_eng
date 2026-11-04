@@ -233,17 +233,22 @@ function QuizSession({ id }: { id: string }) {
     setSubmitting(true);
     setSubmitError("");
     try {
-      const saved = await studentApi.submit(
+      const result = await studentApi.submitIfUnsubmitted(
         id,
         toSubmitRequest(quiz, answers),
         controller.signal,
       );
       if (controller.signal.aborted) return;
-      setReceipt(saved);
+      if (result.kind === "already-submitted") {
+        setQuiz(result.quiz);
+        setReceipt(null);
+      } else {
+        setReceipt(result.receipt);
+      }
       try {
         sessionStorage.removeItem(draftKey(id));
       } catch {
-        /* Server receipt already confirmed. */
+        /* The server has confirmed that this quiz is submitted. */
       }
     } catch (error) {
       if (!controller.signal.aborted)

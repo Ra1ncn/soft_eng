@@ -10,6 +10,10 @@ const REQUEST_TIMEOUT_MS = 15_000;
 
 class StudentRequestError extends Error {}
 
+export type StudentSubmissionResult =
+  | { kind: "already-submitted"; quiz: QuizDetailResponse }
+  | { kind: "saved"; receipt: SubmitResponse };
+
 function canceled(signal: AbortSignal): Error {
   return signal.reason instanceof Error
     ? signal.reason
@@ -111,6 +115,17 @@ export const studentApi = {
       true,
     );
   },
+
+  async submitIfUnsubmitted(
+    id: string,
+    body: SubmitRequest,
+    signal?: AbortSignal,
+  ): Promise<StudentSubmissionResult> {
+    const quiz = await studentApi.detail(id, signal);
+    if (quiz.submittedAt) return { kind: "already-submitted", quiz };
+    const receipt = await studentApi.submit(id, body, signal);
+    return { kind: "saved", receipt };
+  },
 };
 
 /** Keep technical or backend-language errors out of the English student interface. */
@@ -123,7 +138,7 @@ export function studentErrorMessage(
       return "Student access is unavailable. Please check the demo student setup and try again.";
     if (error.status === 404)
       return action === "submit"
-        ? "The submission service is not available yet. Your answers are still here. Please try again later."
+        ? "This quiz is no longer available. Your answers are still here."
         : "This quiz is not available. Return to your quizzes or try again.";
     if (error.status === 400)
       return "Some answers could not be accepted. Review your selections and try again.";

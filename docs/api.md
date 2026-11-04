@@ -140,16 +140,16 @@
 
 | ID | 含义 |
 | --- | --- |
-| teacher-demo | TEACHER，示例 quiz 的老师 |
-| student-demo | STUDENT |
-| quiz-demo | 数据库基础小测 |
-| quiz-demo-q1 | position 0，SINGLE_CHOICE |
-| quiz-demo-q1-o1 | position 0，主键，正确 |
-| quiz-demo-q1-o2 | position 1，普通索引，错误 |
-| quiz-demo-q2 | position 1，MULTIPLE_SELECT |
-| quiz-demo-q2-o1 | position 0，值唯一，正确 |
-| quiz-demo-q2-o2 | position 1，不能为 NULL，正确 |
-| quiz-demo-q2-o3 | position 2，值可以重复，错误 |
+| teacher-demo | TEACHER，Demo Teacher，示例 quiz 的老师 |
+| student-demo | STUDENT，Demo Student |
+| quiz-demo | Database fundamentals |
+| quiz-demo-q1 | position 0，SINGLE_CHOICE，Which item uniquely identifies a row in a database table? |
+| quiz-demo-q1-o1 | position 0，Primary key，正确 |
+| quiz-demo-q1-o2 | position 1，Regular index，错误 |
+| quiz-demo-q2 | position 1，MULTIPLE_SELECT，Which properties must a primary key have? |
+| quiz-demo-q2-o1 | position 0，Values are unique，正确 |
+| quiz-demo-q2-o2 | position 1，Values cannot be NULL，正确 |
+| quiz-demo-q2-o3 | position 2，Values may repeat，错误 |
 
 seed 使用固定 ID 的事务 upsert，不删除学生提交，也不创建重复数据。重跑会恢复示例记录的标题、题目、选项与演示身份字段；不要把演示 quiz 作为可随意修改的个人测试数据。
 
