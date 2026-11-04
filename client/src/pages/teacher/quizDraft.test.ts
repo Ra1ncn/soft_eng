@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CreateQuizRequest } from "@quiz/shared";
 import {
-  addOption, addQuestion, createDraft, describeFields, questionHasError, removeOption, removeQuestion, setOptionCorrect,
+  addOption, addQuestion, createDraft, describeFields, draftHasContent, optionHasContent, questionHasContent, questionHasError, removeOption, removeQuestion, setOptionCorrect,
   setOptionText, setPrompt, setQuestionType, toCreateRequest, validateDraft, type QuizDraft,
 } from "./quizDraft.ts";
 
@@ -132,6 +132,41 @@ describe("validation", () => {
       "questions.0.options.1.text": "Add the option text.",
       unknown: "Check this field and try again.",
     });
+  });
+});
+
+describe("unsaved content", () => {
+  it("treats a new draft as empty, even with blank rows added", () => {
+    const draft = createDraft();
+    expect(draftHasContent(draft)).toBe(false);
+    expect(draftHasContent(addOption(addQuestion(draft), draft.questions[0]!.key))).toBe(false);
+  });
+
+  it("ignores whitespace and a type change alone", () => {
+    const draft = createDraft();
+    const { key } = draft.questions[0]!;
+    expect(draftHasContent({ ...draft, title: "   " })).toBe(false);
+    expect(draftHasContent(setPrompt(draft, key, "  "))).toBe(false);
+    expect(draftHasContent(setQuestionType(draft, key, "MULTIPLE_SELECT"))).toBe(false);
+  });
+
+  it("notices a title, a prompt, option text, or a marked answer", () => {
+    const draft = createDraft();
+    const { key, options } = draft.questions[0]!;
+    const optionKey = options[0]!.key;
+    expect(draftHasContent({ ...draft, title: "Quiz" })).toBe(true);
+    expect(draftHasContent(setPrompt(draft, key, "Why?"))).toBe(true);
+    expect(draftHasContent(setOptionText(draft, key, optionKey, "A"))).toBe(true);
+    expect(draftHasContent(setOptionCorrect(draft, key, optionKey, true))).toBe(true);
+  });
+
+  it("checks one question and one option on their own", () => {
+    const filled = setOptionText(createDraft(), createDraft().questions[0]!.key, "", "");
+    expect(questionHasContent(filled.questions[0]!)).toBe(false);
+    expect(questionHasContent({ ...filled.questions[0]!, prompt: "Why?" })).toBe(true);
+    expect(optionHasContent({ key: "o", text: " ", isCorrect: false })).toBe(false);
+    expect(optionHasContent({ key: "o", text: "A", isCorrect: false })).toBe(true);
+    expect(optionHasContent({ key: "o", text: "", isCorrect: true })).toBe(true);
   });
 });
 

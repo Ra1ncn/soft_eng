@@ -62,6 +62,10 @@ export const setOptionCorrect = (draft: QuizDraft, questionKey: string, optionKe
     }),
   }));
 
+export const optionHasContent = (option: OptionDraft) => option.text.trim() !== "" || option.isCorrect;
+export const questionHasContent = (question: QuestionDraft) => question.prompt.trim() !== "" || question.options.some(optionHasContent);
+export const draftHasContent = (draft: QuizDraft) => draft.title.trim() !== "" || draft.questions.some(questionHasContent);
+
 export const toCreateRequest = (draft: QuizDraft): CreateQuizRequest => ({
   title: draft.title,
   questions: draft.questions.map(({ prompt, type, options }) => ({

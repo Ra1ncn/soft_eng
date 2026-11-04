@@ -36,6 +36,7 @@
 | PageShell | 页面容器、跳过导航链接、统一 TopNav、main、footer 和响应式间距；已在应用根部挂载一次，业务页不要重复嵌套 |
 | TopNav | 白色胶囊导航，保留 Teacher/Student 路径，自动标识当前入口 |
 | Icon | 自绘几何线条的装饰性 SVG；搭配可读文字，默认 aria-hidden |
+| ConfirmDialog | Modal confirmation built on the native `dialog`. Takes `open`, `title`, `message`, `confirmLabel`, `cancelLabel`, `onConfirm`, and `onCancel`. Escape and a backdrop click both cancel. |
 | Select | Themed dropdown for picking one value. Takes `aria-label`, `value`, `options` (`value`, `label`), and `onChange`. Supports arrow keys, Home/End, Enter/Space, Escape, and Tab. |
 | QuestionNav | Numbered jump list: a sticky left column on desktop and a top strip at 700px and below. `items` takes `targetId` and optional `hasError`. Each target needs `tabIndex={-1}` and a `scroll-margin-top`. |
 

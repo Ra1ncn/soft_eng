@@ -9,3 +9,4 @@ export { TopNav } from "./TopNav.tsx";
 export { Icon } from "./Icon.tsx";
 export { QuestionNav, type QuestionNavItem } from "./QuestionNav.tsx";
 export { Select, type SelectOption, type SelectProps } from "./Select.tsx";
+export { ConfirmDialog, type ConfirmDialogProps } from "./ConfirmDialog.tsx";
