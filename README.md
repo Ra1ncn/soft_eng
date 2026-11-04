@@ -62,7 +62,7 @@ prisma.config.ts                   根目录 Prisma 路径与 seed 配置
 
 `@quiz/shared` 直接导出 TypeScript 源码，本地由 Vite/tsx 处理，无需单独构建共享包。Prisma 7 用 `prisma-client` 生成器及 PostgreSQL adapter，客户端生成至忽略的 `server/src/generated/prisma/`，不要提交生成代码。Prisma 7 的 `migrate dev` 不自动生成客户端，因此 seed 命令先执行 `prisma generate`；`npm run typecheck`、`npm test`、`npm run dev` 也会先生成客户端。
 
-后端在 Express 5 异步路由中调用 `getCurrentUser(req)`，检查 user.role，不允许的角色抛出 `new AppError("FORBIDDEN", "身份没有权限")`。再使用 `CreateQuizRequest.parse(req.body)` 或 `SubmitRequest.parse(req.body)`；Zod 错误会转为 400，fields 使用点分路径。数据库错误只向客户端返回通用 500。
+后端在 Express 5 异步路由中调用 `getCurrentUser(req)`，检查 user.role，不允许的角色抛出 `new AppError("FORBIDDEN", "身份没有权限")`。再使用 `CreateQuizRequest.parse(req.body)` 或 `SubmitRequest.parse(req.body)`；Zod 错误会转为 400，fields 使用点分路径。数据库错误只向客户端返回通用 500。500 的原始错误只写入服务端日志，不返回客户端；400、403、404 不写入错误日志。
 
 前端示例（供 B/C/D 接入业务页面，不代表接口已实现）：
 
@@ -73,7 +73,13 @@ const result = await apiFetch<QuizListResponse>("/api/quizzes", "STUDENT");
 // 创建请求：options = { method: "POST", body: JSON.stringify(body) }
 ```
 
-`apiFetch` 自动设置 X-Demo-Role 和带 body 的 JSON Content-Type，非 2xx 抛 `ApiFetchError`，包含 status 和 error.fields。只能请求本项目 `/api/` 路径。
+`apiFetch` 自动设置 X-Demo-Role 和带 body 的 JSON Content-Type，只能请求本项目 `/api/` 路径。响应处理规则：
+
+- 先读取响应文本；2xx 空响应（包括 204）返回 `undefined`，合法 JSON 返回解析后的数据。
+- 2xx 非合法 JSON 抛 `ApiFetchError`，保留真实 HTTP status，使用通用 `INTERNAL_ERROR` 说明。
+- 非 2xx 且符合共享 `ApiErrorResponse` 时，抛 `ApiFetchError` 并保留后端 code、message、fields 和真实 status。
+- 其他非 2xx（空响应、HTML、纯文本或不符合契约的 JSON）也抛 `ApiFetchError`，保留真实 status，code 为 `INTERNAL_ERROR`，message 为通用说明，不透传原始响应内容。
+- `fetch` 本身的网络失败原样抛出，本封装不转换。
 
 **演示身份可以被任意伪造。接入真实登录时必须删除此身份实现及前端演示请求头。** 本阶段没有 session，不符合真实登录要求。
 

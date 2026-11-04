@@ -1,4 +1,4 @@
-import type { ApiErrorResponse, DemoRole } from "@quiz/shared";
+import { ApiErrorResponse, type DemoRole } from "@quiz/shared";
 
 export class ApiFetchError extends Error {
   constructor(readonly status: number, readonly error: ApiErrorResponse["error"]) {
@@ -13,7 +13,21 @@ export async function apiFetch<T>(path: string, role: DemoRole, options: Request
   headers.set("X-Demo-Role", role);
   if (options.body !== undefined && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
   const response = await fetch(path, { ...options, headers });
-  const body: unknown = await response.json();
-  if (!response.ok) throw new ApiFetchError(response.status, (body as ApiErrorResponse).error);
+  const text = await response.text();
+  if (response.ok && text === "") return undefined as T;
+  const genericError: ApiErrorResponse["error"] = {
+    code: "INTERNAL_ERROR",
+    message: "服务器响应异常，请稍后重试",
+  };
+  let body: unknown;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    throw new ApiFetchError(response.status, genericError);
+  }
+  if (!response.ok) {
+    const parsed = ApiErrorResponse.safeParse(body);
+    throw new ApiFetchError(response.status, parsed.success ? parsed.data.error : genericError);
+  }
   return body as T;
 }

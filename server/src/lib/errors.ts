@@ -27,6 +27,7 @@ export const errorHandler: ErrorRequestHandler = (error: unknown, _req, res, _ne
   } else {
     normalized = error instanceof AppError ? error : new AppError("INTERNAL_ERROR", "服务器内部错误");
   }
+  if (normalized.status === 500) console.error(error);
   const body: ApiErrorResponse = { error: {
     code: normalized.code,
     message: normalized.status === 500 ? "服务器内部错误" : normalized.message,
