@@ -1,0 +1,7 @@
+.nav { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 10px 14px 10px 20px; min-height: 68px; border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-surface); }
+.brand { display: flex; align-items: center; gap: 9px; color: var(--color-text); font-size: 18px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.mark { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--color-surface-sage); }
+.links { display: flex; gap: var(--space-2); }
+.link { padding: 9px 17px; color: var(--color-text); text-decoration: none; border-radius: var(--radius-pill); font-size: 14px; font-weight: 500; }
+.link:hover, .active { background: var(--color-surface-sage); }
+@media (max-width: 480px) { .nav { padding: 8px 10px 8px 14px; gap: var(--space-2); min-height: 62px; } .brand { font-size: 16px; gap: 7px; } .link { padding: 9px 11px; } .links { gap: 0; } }
