@@ -67,7 +67,7 @@ C 负责学生页面及测验查询接口。本模块沿用公共主题、设计
 
 ## B、D 交接
 
-**B：** 创建接口与教师页面目前位于独立的 PR #4，尚未合并到本分支。其创建记录应保持共享数据结构和 `position` 规则，C 的查询及页面即可读取。本文不执行或要求自动合并该 PR。
+**B：** 创建接口与教师页面已通过 PR #4 合并进 main，C 分支已同步并保留其实现，包括 Data Router 和未保存内容的离开保护。C 按共享数据结构和 `position` 规则读取 B 创建的记录。
 
 **D：** 实现 `POST /api/quizzes/:quizId/submissions`。现有客户端已使用 `optionIds`，并处理共享回执、失败、超时和重复点击；D 仍须按 [API 约定](api.md#post-apiquizzesquizidsubmissions) 完成身份与归属检查、事务写入、每题答案记录和重复提交返回原记录。前端锁和已提交页面不能代替这些服务端保证。
 
@@ -86,7 +86,7 @@ D 完成后，需要重新验证“真实 POST → 数据库记录 → 返回回
 
 ## 当前验证记录
 
-- 全部 94 项自动测试通过；所有 workspace 的 TypeScript 检查通过。
+- 独立 C 实现首次通过 94 项自动测试；同步最新 main 中的 B 功能并解决冲突后，当前分支 132 项测试、所有 workspace 的 TypeScript 检查和生产构建全部通过。
 - 使用 PostgreSQL 18.6 完成 22 项真实 GET 集成检查，验证后清理了临时测试记录。
 - 已在浏览器验证列表与搜索、两种题型、未答题提示、取消确认、刷新恢复草稿，以及 D 当前返回 404 时保留答案。
 - 本次 Windows 验证使用临时隔离的 Node.js 26.13.0 和本地 `.env`：前端 5174、后端 3001、数据库 55432。仓库标准启动流程和 Docker 默认配置未改变。
@@ -100,10 +100,10 @@ D 完成后，需要重新验证“真实 POST → 数据库记录 → 返回回
 | 学生列表 | [1280px](validation/student-c/list-1280.jpg) | [390px](validation/student-c/list-390.jpg) |
 | 学生作答 | [1280px](validation/student-c/answer-1280.jpg) | [390px](validation/student-c/answer-390.jpg) |
 
-另在独立副本中组合 B 的 `feat/create-quiz` 与 C 的实现：保留 B 的创建路由和 Data Router，补入 C 的读取路由与学生详情页。组合后的 132 项测试、workspace 类型检查和生产构建均通过。浏览器实际完成“B 老师页创建并保存 → C 列表显示新记录 → 打开新题目并选择答案”。[教师页面](validation/student-c/b-teacher-comparison.jpg)、[学生打开新建测验](validation/student-c/b-to-c-created-quiz.jpg)。该验证没有合并 main、没有修改 B 分支，也没有实现 D 的提交保存。
+首先在独立副本中组合 B 的 `feat/create-quiz` 与 C 的实现：保留 B 的创建路由和 Data Router，补入 C 的读取路由与学生详情页，132 项测试、workspace 类型检查和生产构建均通过。浏览器实际完成“B 老师页创建并保存 → C 列表显示新记录 → 打开新题目并选择答案”。[教师页面](validation/student-c/b-teacher-comparison.jpg)、[学生打开新建测验](validation/student-c/b-to-c-created-quiz.jpg)。随后发现 B 已由组员合并进 main，因此在 C 分支同步最新 main，并保留已验证的组合逻辑；没有修改远程 main 或 B 分支，也没有实现 D 的提交保存。
 
 ## Report 可准确描述的进展
 
 可以写：C 已实现读取真实数据库的测验列表、详情与学生作答界面，支持单选／多选、草稿恢复、提交确认、错误处理及共享回执成功状态，并通过上述查询和客户端验证。
 
-需要保留的限制：真实登录未接入；B 创建功能仍待合并；D 的提交持久化尚未实现；当前不能声称已经完成从教师创建到学生答案入库的完整流程，也没有评分或 AI 功能。
+需要保留的限制：真实登录未接入；D 的提交持久化尚未实现；当前已验证教师创建到学生读取和作答，但不能声称已经完成学生答案入库的完整流程，也没有评分或 AI 功能。

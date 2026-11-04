@@ -2,7 +2,7 @@
 
 React / TypeScript / Vite + Express / Zod + PostgreSQL / Prisma，使用 npm workspaces。A 提供平台基础、数据库和接口契约，方便 B、C、D 在同一仓库并行开发。
 
-当前已实现 A 的数据库健康检查，以及 C 的学生列表、作答页面和两个查询接口。学生端读取真实数据库，支持单选、多选、草稿和提交确认。B 的创建功能在尚未合并的 PR #4 中；本分支的创建接口和 D 的提交接口仍为空路由，返回统一 404。提交成功页面已按共享响应接好，但真实提交持久化仍需 D 完成。接口约定见 [docs/api.md](docs/api.md)，C 的范围、操作与交接见 [docs/student.md](docs/student.md)。没有真实登录、评分、截止时间、发布状态、访问码或 AI 功能。
+当前已实现 A 的数据库健康检查、B 的教师创建页面和创建接口，以及 C 的学生列表、作答页面和两个查询接口。学生端读取真实数据库，支持单选、多选、草稿和提交确认。B 的 PR #4 已合并，C 分支已同步最新 main 并保留其实现。D 的提交接口仍为空路由，返回统一 404；成功页面已按共享响应接好，真实提交持久化仍需 D 完成。接口约定见 [docs/api.md](docs/api.md)，C 的范围、操作与交接见 [docs/student.md](docs/student.md)。没有真实登录、评分、截止时间、发布状态、访问码或 AI 功能。
 
 ## 环境与首次启动
 
@@ -46,10 +46,12 @@ Prisma Studio 打开其终端给出的地址，选择 `Quiz` 表并筛选 `id = 
 ## 目录与公共基础
 
 ```text
-client/src/pages/teacher/           B：教师页面占位
+client/src/pages/teacher/           B：教师创建页面已实现
 client/src/pages/student/           C：列表、搜索、作答、草稿、提交确认及成功/失败状态
 client/src/lib/apiFetch.ts          演示身份请求封装
-server/src/modules/quizzes/         B：创建接口待合并；C：列表和详情已实现
+client/src/lib/scrollAndFocus.ts    公共滚动和焦点工具
+client/src/main.tsx                Data Router；在此添加页面路由
+server/src/modules/quizzes/         B：创建接口；C：列表和详情，均已实现
 server/src/modules/submissions/     D：提交接口（空路由，mergeParams 已启用）
 server/src/auth/getCurrentUser.ts   从 X-Demo-Role 获取 seed 用户
 server/src/lib/prisma.ts            Prisma Client 单例
@@ -99,11 +101,13 @@ schema 变更统一请 A 完成或 review。拉取最新 main 后再生成新 mi
 
 ## B、C、D 接手
 
-- **B**：在 `client/src/pages/teacher/` 完成创建页；在 quizzes 路由添加 POST `/`。使用 TEACHER、共享请求校验，服务端按数组生成 position，并保存正确答案。
+- **B**：已完成 `/teacher` 和 POST `/api/quizzes`，按数组顺序保存 position，正确答案保留在服务端。编辑、发布和教师测验列表尚未实现。
 - **C**：已完成 `client/src/pages/student/` 的列表、搜索和作答页，以及 quizzes 路由 GET `/`、GET `/:quizId`。只允许 STUDENT；显式 select 不含 isCorrect，按 position 排序。提交前后状态已就绪，真实保存等待 D；详见 [docs/student.md](docs/student.md)。
 - **D**：在 submissions 路由添加 POST `/`，`req.params.quizId` 来自 mergeParams。只允许 STUDENT；验证归属、重复和单选限制，在事务中存所有题的答案（含未答），处理提交唯一约束并返回原有记录；返回共享 `SubmitResponse` 即可驱动 C 已有的成功状态。
 
-组员各自从最新 main 创建功能分支，不在共享工作分支同时提交。C 已用真实 seed 数据验证查询；D 可基于 seed 测试事务。B 的 PR #4 是独立的待合并工作，本说明不执行或要求自动合并。共享契约或 schema 修改请与 A 对齐。另需组长邀请余下成员、设置 main 保护、分配 PR review，并让至少一位组员从零实际启动；这些人工验收尚不能由 A 代替。
+实现新接口时同步更新 `server/src/app.test.ts`，不再把已实现的接口列为返回 404 的占位路由。
+
+组员各自从最新 main 创建功能分支，不在共享工作分支同时提交。C 已用真实 seed 数据验证查询，并验证 B 创建的新测验可以读取和作答；D 可基于 seed 测试事务。共享契约或 schema 修改请与 A 对齐。另需组长邀请余下成员、设置 main 保护、分配 PR review，并让至少一位组员从零实际启动；这些人工验收尚不能由 A 代替。
 
 ## 实际验证与附件修正
 
@@ -111,4 +115,4 @@ schema 变更统一请 A 完成或 review。拉取最新 main 后再生成新 mi
 
 ## 前端视觉系统
 
-统一主题、组件接口、B/C 使用示例和实际验证见 [docs/ui-theme.md](docs/ui-theme.md)。运行前端后访问 `/ui-preview` 查看所有组件、表单及状态。界面默认使用英文，字体通过 Fontsource 自托管。
+统一主题、组件接口、B/C 使用示例和实际验证见 [docs/ui-theme.md](docs/ui-theme.md)。运行前端后访问 `/ui-preview` 查看基础组件、表单及状态。`Select`, `QuestionNav`, and `ConfirmDialog` are not on that page yet; see them in use on `/teacher`.界面默认使用英文，字体通过 Fontsource 自托管。

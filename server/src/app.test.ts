@@ -41,12 +41,10 @@ it("未知 API 路由返回统一 404", async () => {
   expect(response.status).toBe(404); expect(response.body.error.code).toBe("NOT_FOUND");
   expect(console.error).not.toHaveBeenCalled();
 });
-it("B/D 写入接口保持未实现", async () => {
-  for (const [method, path] of [["post", "/api/quizzes"], ["post", "/api/quizzes/quiz-demo/submissions"]] as const) {
-    expect((await request(app)[method](path)).status).toBe(404);
-  }
+it("D submission endpoint remains unimplemented", async () => {
+  expect((await request(app).post("/api/quizzes/quiz-demo/submissions")).status).toBe(404);
 });
-it("学生读取接口已挂载，未提供身份时返回 403", async () => {
+it("C read routes enforce the student role before querying", async () => {
   for (const path of ["/api/quizzes", "/api/quizzes/quiz-demo"]) {
     const response = await request(app).get(path);
     expect(response.status).toBe(403);
