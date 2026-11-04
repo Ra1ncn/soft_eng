@@ -41,8 +41,10 @@ it("未知 API 路由返回统一 404", async () => {
   expect(response.status).toBe(404); expect(response.body.error.code).toBe("NOT_FOUND");
   expect(console.error).not.toHaveBeenCalled();
 });
-it("D submission endpoint remains unimplemented", async () => {
-  expect((await request(app).post("/api/quizzes/quiz-demo/submissions")).status).toBe(404);
+it("D submission endpoint requires a student identity", async () => {
+  const response = await request(app).post("/api/quizzes/quiz-demo/submissions").send({ answers: [] });
+  expect(response.status).toBe(403);
+  expect(response.body.error.code).toBe("FORBIDDEN");
 });
 it("C read routes enforce the student role before querying", async () => {
   for (const path of ["/api/quizzes", "/api/quizzes/quiz-demo"]) {

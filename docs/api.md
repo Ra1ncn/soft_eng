@@ -1,7 +1,7 @@
 # 第一阶段 API 约定
 
 本文件是 B、C、D 的接口标准，与 `shared/contracts.ts` 同步维护。
-当前已实现 A 的 `GET /api/health`、B 的 `POST /api/quizzes` 和 C 的两个学生查询接口。B 的 PR #4 已合并并同步到 C 分支；D 的提交接口仍为空路由，返回统一 404。下表区分当前实现状态；未实现接口的权限、成功响应及业务错误仍是后续实现要求。C 的学生页面、验证范围和提交交接见 [student.md](student.md)。
+当前已实现 A 的 `GET /api/health`、B 的 `POST /api/quizzes` 和 C 的两个学生查询接口。B 的 PR #4 已合并并同步到 C 分支；D 的提交接口已实现校验、事务持久化与重复提交保护。下表列出当前实现状态。C 的学生页面、验证范围和提交交接见 [student.md](student.md)。
 
 ## 通用规则
 
@@ -21,7 +21,7 @@
 | `POST /api/quizzes` | B | 已实现 | TEACHER | 201 | `CreateQuizResponse` |
 | `GET /api/quizzes` | C | 已实现 | STUDENT（老师返回 403） | 200 | `QuizListResponse` |
 | `GET /api/quizzes/:quizId` | C | 已实现 | STUDENT（老师返回 403） | 200 | `QuizDetailResponse` |
-| `POST /api/quizzes/:quizId/submissions` | D | 未实现 | STUDENT（老师返回 403） | 首次 201，重复 200 | `SubmitResponse` |
+| `POST /api/quizzes/:quizId/submissions` | D | 已实现 | STUDENT（老师返回 403） | 首次 201，重复 200 | `SubmitResponse` |
 
 ## 统一错误
 

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1510" viewBox="0 0 1500 1510" role="img" aria-labelledby="title desc">
+<title id="title">Quiz Platform and Answer Submission Workflow</title><desc id="desc">Teachers create quizzes, students answer, and the server validates and saves submissions atomically. Retries return the original receipt.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0 0 L10 4 L0 8Z" fill="#64748b"/></marker></defs>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#172b4d;font-size:19px}.small{font-size:16px;fill:#475569}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow)}.box{stroke-width:1.5}</style>
+<rect width="1500" height="1510" fill="#f8fafc"/>
+<text x="750" y="42" text-anchor="middle" style="font-size:30px;font-weight:bold">Quiz Platform · Create, Answer and Submit</text>
+<text x="750" y="73" text-anchor="middle" class="small">A / B / C / D Workflow · Fixed Demo Identities · One Submission per Student per Quiz</text>
+<rect class="box" x="510" y="100" width="480" height="65" rx="12" fill="#fff" stroke="#cbd5e1"/>
+<text x="750.0" y="138.5" text-anchor="middle">A: Start app, migrate DB, seed demo users</text>
+<rect class="box" x="510" y="205" width="480" height="65" rx="12" fill="#fff" stroke="#cbd5e1"/>
+<text x="750.0" y="243.5" text-anchor="middle">B: Teacher creates and saves quiz content</text>
+<rect class="box" x="510" y="310" width="480" height="65" rx="12" fill="#fff" stroke="#cbd5e1"/>
+<text x="750.0" y="348.5" text-anchor="middle">C: Load quiz and select answers</text>
+<rect class="box" x="510" y="415" width="480" height="65" rx="12" fill="#fff" stroke="#cbd5e1"/>
+<text x="750.0" y="453.5" text-anchor="middle">C: Review answer counts and confirm</text>
+<rect class="box" x="510" y="520" width="480" height="65" rx="12" fill="#eff6ff" stroke="#60a5fa"/>
+<text x="750.0" y="558.5" text-anchor="middle">D: Receive POST submissions request</text>
+<rect class="box" x="510" y="625" width="480" height="65" rx="12" fill="#fffbeb" stroke="#fcd34d"/>
+<text x="750.0" y="663.5" text-anchor="middle">Check student role, format and duplicate IDs</text>
+<rect class="box" x="510" y="730" width="480" height="80" rx="12" fill="#fffbeb" stroke="#fcd34d"/>
+<text x="750.0" y="763.0" text-anchor="middle">Begin transaction and load quiz</text>
+<text x="750.0" y="789.0" text-anchor="middle">Check existence, ownership and choice limits</text>
+<rect class="box" x="510" y="850" width="480" height="65" rx="12" fill="#fffbeb" stroke="#fcd34d"/>
+<text x="750.0" y="888.5" text-anchor="middle">Has this student already submitted?</text>
+<rect class="box" x="510" y="955" width="480" height="80" rx="12" fill="#eff6ff" stroke="#60a5fa"/>
+<text x="750.0" y="988.0" text-anchor="middle">Save submission and an answer per question</text>
+<text x="750.0" y="1014.0" text-anchor="middle">Include unanswered questions; write atomically</text>
+<rect class="box" x="510" y="1115" width="480" height="70" rx="12" fill="#ecfdf5" stroke="#6ee7b7"/>
+<text x="750.0" y="1143.0" text-anchor="middle">First submission: 201 with new receipt</text>
+<text x="750.0" y="1169.0" text-anchor="middle">Retry / concurrent request: 200 original receipt</text>
+<rect class="box" x="510" y="1235" width="480" height="70" rx="12" fill="#ecfdf5" stroke="#6ee7b7"/>
+<text x="750.0" y="1276.0" text-anchor="middle">C: Validate receipt, clear draft, show success</text>
+<rect class="box" x="510" y="1355" width="480" height="65" rx="12" fill="#ecfdf5" stroke="#6ee7b7"/>
+<text x="750.0" y="1393.5" text-anchor="middle">Refresh: database still shows submitted status</text>
+<path class="edge" d="M750 165 V205"/>
+<path class="edge" d="M750 270 V310"/>
+<path class="edge" d="M750 375 V415"/>
+<path class="edge" d="M750 480 V520"/>
+<path class="edge" d="M750 585 V625"/>
+<path class="edge" d="M750 690 V730"/>
+<path class="edge" d="M750 810 V850"/>
+<path class="edge" d="M750 1185 V1235"/>
+<path class="edge" d="M750 1305 V1355"/>
+<path class="edge" d="M750 915 V955"/>
+<text class="small" x="765" y="940">No</text>
+<path class="edge" d="M750 1035 V1115"/>
+<text class="small" x="765" y="1080">Transaction committed</text>
+<rect class="box" x="1110" y="625" width="330" height="65" rx="12" fill="#fff1f2" stroke="#fda4af"/>
+<text x="1275.0" y="663.5" text-anchor="middle">403 / 400: Keep answers on page</text>
+<path class="edge" d="M990 657 H1110"/>
+<text class="small" x="1010" y="645">Invalid</text>
+<rect class="box" x="1110" y="730" width="330" height="80" rx="12" fill="#fff1f2" stroke="#fda4af"/>
+<text x="1275.0" y="763.0" text-anchor="middle">404 / 400: Roll back transaction</text>
+<text x="1275.0" y="789.0" text-anchor="middle">Do not show success</text>
+<path class="edge" d="M990 770 H1110"/>
+<text class="small" x="1010" y="756">Invalid</text>
+<rect class="box" x="60" y="850" width="330" height="65" rx="12" fill="#ecfdf5" stroke="#6ee7b7"/>
+<text x="225.0" y="888.5" text-anchor="middle">Return original; preserve answers</text>
+<path class="edge" d="M510 882 H390"/>
+<text class="small" x="445" y="870">Yes</text>
+<path class="edge" d="M225 915 V1150 H510"/>
+<rect class="box" x="1110" y="940" width="330" height="85" rx="12" fill="#eff6ff" stroke="#60a5fa"/>
+<text x="1275.0" y="975.5" text-anchor="middle">Submission uniqueness conflict</text>
+<text x="1275.0" y="1001.5" text-anchor="middle">Roll back, then read saved record</text>
+<path class="edge" d="M990 985 H1110"/>
+<path class="edge" d="M1275 1025 V1150 H990"/>
+<rect class="box" x="1110" y="1235" width="330" height="70" rx="12" fill="#fff1f2" stroke="#fda4af"/>
+<text x="1275.0" y="1263.0" text-anchor="middle">Other DB errors: Roll back all</text>
+<text x="1275.0" y="1289.0" text-anchor="middle">500: Keep answers; no success</text>
+<path class="edge" d="M900 1035 V1085 H1470 V1270 H1440"/>
+<text x="750" y="1470" text-anchor="middle" class="small">Failed transactions leave no partial answers. Validate requests before checking retries. See docs/workflow.md.</text></svg>

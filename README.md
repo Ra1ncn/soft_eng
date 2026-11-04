@@ -2,7 +2,7 @@
 
 React / TypeScript / Vite + Express / Zod + PostgreSQL / Prisma，使用 npm workspaces。A 提供平台基础、数据库和接口契约，方便 B、C、D 在同一仓库并行开发。
 
-当前已实现 A 的数据库健康检查、B 的教师创建页面和创建接口，以及 C 的学生列表、作答页面和两个查询接口。学生端读取真实数据库，支持单选、多选、草稿和提交确认。B 的 PR #4 已合并，C 分支已同步最新 main 并保留其实现。D 的提交接口仍为空路由，返回统一 404；成功页面已按共享响应接好，真实提交持久化仍需 D 完成。接口约定见 [docs/api.md](docs/api.md)，C 的范围、操作与交接见 [docs/student.md](docs/student.md)。没有真实登录、评分、截止时间、发布状态、访问码或 AI 功能。
+当前已实现 A 的数据库健康检查、B 的教师创建页面和创建接口，以及 C 的学生列表、作答页面和两个查询接口。学生端读取真实数据库，支持单选、多选、草稿和提交确认。B 的 PR #4 已合并，C 分支已同步最新 main 并保留其实现。D 的提交接口已实现事务保存、每题答案记录和重复提交保护，并返回 C 已接好的成功回执；真实数据库验收已通过，包括重复提交、8 个并发请求与已提交状态持久化。流程图和验收方式见 [docs/workflow.md](docs/workflow.md)。接口约定见 [docs/api.md](docs/api.md)，C 的范围、操作与交接见 [docs/student.md](docs/student.md)。没有真实登录、评分、截止时间、发布状态、访问码或 AI 功能。
 
 ## 环境与首次启动
 
@@ -52,7 +52,7 @@ client/src/lib/apiFetch.ts          演示身份请求封装
 client/src/lib/scrollAndFocus.ts    公共滚动和焦点工具
 client/src/main.tsx                Data Router；在此添加页面路由
 server/src/modules/quizzes/         B：创建接口；C：列表和详情，均已实现
-server/src/modules/submissions/     D：提交接口（空路由，mergeParams 已启用）
+server/src/modules/submissions/     D：提交接口（事务保存、校验与重复提交保护）
 server/src/auth/getCurrentUser.ts   从 X-Demo-Role 获取 seed 用户
 server/src/lib/prisma.ts            Prisma Client 单例
 server/src/lib/errors.ts            AppError 和统一错误中间件
@@ -102,8 +102,8 @@ schema 变更统一请 A 完成或 review。拉取最新 main 后再生成新 mi
 ## B、C、D 接手
 
 - **B**：已完成 `/teacher` 和 POST `/api/quizzes`，按数组顺序保存 position，正确答案保留在服务端。编辑、发布和教师测验列表尚未实现。
-- **C**：已完成 `client/src/pages/student/` 的列表、搜索和作答页，以及 quizzes 路由 GET `/`、GET `/:quizId`。只允许 STUDENT；显式 select 不含 isCorrect，按 position 排序。提交前后状态已就绪，真实保存等待 D；详见 [docs/student.md](docs/student.md)。
-- **D**：在 submissions 路由添加 POST `/`，`req.params.quizId` 来自 mergeParams。只允许 STUDENT；验证归属、重复和单选限制，在事务中存所有题的答案（含未答），处理提交唯一约束并返回原有记录；返回共享 `SubmitResponse` 即可驱动 C 已有的成功状态。
+- **C**：已完成 `client/src/pages/student/` 的列表、搜索和作答页，以及 quizzes 路由 GET `/`、GET `/:quizId`。只允许 STUDENT；显式 select 不含 isCorrect，按 position 排序。提交前后状态已就绪，已与 D 的共享回执对接；详见 [docs/student.md](docs/student.md)。
+- **D**：已实现 submissions POST `/`，只允许 STUDENT；验证归属、重复和单选限制，在事务中保存所有题的答案（含未答），首次返回 201、重复返回 200 原记录；处理并发唯一约束冲突。流程图和真实数据库验收命令见 [docs/workflow.md](docs/workflow.md)。
 
 实现新接口时同步更新 `server/src/app.test.ts`，不再把已实现的接口列为返回 404 的占位路由。
 

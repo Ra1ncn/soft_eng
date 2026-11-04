@@ -16,6 +16,7 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "pretypecheck": "prisma generate",
     "test": "vitest run",
+    "test:submissions:db": "prisma generate && tsx --env-file=.env server/scripts/verify-submissions.ts",
     "pretest": "prisma generate",
     "build": "npm run typecheck && npm run build -w client",
     "prisma:generate": "prisma generate",
