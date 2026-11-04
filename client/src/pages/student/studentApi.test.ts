@@ -108,7 +108,7 @@ it("does not confirm success for an unexpected submission response", async () =>
   );
 });
 
-it("preserves backend errors and provides an English submission-unavailable message", async () => {
+it("preserves backend errors and explains that a missing quiz keeps the answers", async () => {
   vi.stubGlobal(
     "fetch",
     vi
@@ -124,8 +124,8 @@ it("preserves backend errors and provides an English submission-unavailable mess
     .submit("quiz-1", { answers: [] })
     .catch((error: unknown) => error);
   expect(failure).toBeInstanceOf(ApiFetchError);
-  expect(studentErrorMessage(failure, "submit")).toContain(
-    "submission service is not available yet",
+  expect(studentErrorMessage(failure, "submit")).toBe(
+    "This quiz is no longer available. Your answers are still here.",
   );
 });
 
@@ -186,3 +186,127 @@ it("does not start an already canceled request", async () => {
   });
   expect(fetchMock).not.toHaveBeenCalled();
 });
+
+const openQuiz = {
+  id: "quiz-1",
+  title: "Latest quiz title",
+  submittedAt: null,
+  questions: [],
+};
+const savedReceipt = {
+  submissionId: "submission-1",
+  submittedAt: "2026-11-04T18:00:00.000Z",
+};
+
+it("returns the latest submitted detail without posting stale answers", async () => {
+  const quiz = { ...openQuiz, submittedAt: savedReceipt.submittedAt };
+  const fetchMock = vi.fn().mockResolvedValue(response(quiz));
+  vi.stubGlobal("fetch", fetchMock);
+
+  await expect(
+    studentApi.submitIfUnsubmitted("quiz-1", { answers: [] }),
+  ).resolves.toEqual({ kind: "already-submitted", quiz });
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+  expect(fetchMock.mock.calls[0]?.[0]).toBe("/api/quizzes/quiz-1");
+  expect(fetchMock.mock.calls[0]?.[1].method).toBeUndefined();
+});
+
+it("checks the latest detail before posting and returns the validated receipt", async () => {
+  const fetchMock = vi.fn()
+    .mockResolvedValueOnce(response(openQuiz))
+    .mockResolvedValueOnce(response(savedReceipt, 201));
+  vi.stubGlobal("fetch", fetchMock);
+  const payload = { answers: [{ questionId: "q1", optionIds: ["o1"] }] };
+
+  await expect(
+    studentApi.submitIfUnsubmitted("quiz-1", payload),
+  ).resolves.toEqual({ kind: "saved", receipt: savedReceipt });
+  expect(fetchMock).toHaveBeenCalledTimes(2);
+  expect(fetchMock.mock.calls[0]?.[0]).toBe("/api/quizzes/quiz-1");
+  expect(fetchMock.mock.calls[1]?.[0]).toBe("/api/quizzes/quiz-1/submissions");
+  const options = fetchMock.mock.calls[1]?.[1];
+  expect(options.method).toBe("POST");
+  expect(JSON.parse(options.body)).toEqual(payload);
+  expect((options.headers as Headers).get("X-Demo-Role")).toBe("STUDENT");
+});
+
+it.each(["network", "404", "invalid detail"])(
+  "does not post when the precheck fails: %s",
+  async (failure) => {
+    const fetchMock = vi.fn();
+    if (failure === "network") fetchMock.mockRejectedValue(new TypeError("offline"));
+    else if (failure === "404") fetchMock.mockResolvedValue(response({
+      error: { code: "NOT_FOUND", message: "Quiz not found" },
+    }, 404));
+    else fetchMock.mockResolvedValue(response({ ...openQuiz, id: "another-quiz" }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      studentApi.submitIfUnsubmitted("quiz-1", { answers: [] }),
+    ).rejects.toBeInstanceOf(Error);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0]?.[1].method).toBeUndefined();
+  },
+);
+
+it("does not precheck or post an already canceled submission", async () => {
+  const controller = new AbortController();
+  controller.abort();
+  const fetchMock = vi.fn();
+  vi.stubGlobal("fetch", fetchMock);
+  await expect(
+    studentApi.submitIfUnsubmitted("quiz-1", { answers: [] }, controller.signal),
+  ).rejects.toMatchObject({ name: "AbortError" });
+  expect(fetchMock).not.toHaveBeenCalled();
+});
+
+it.each(["precheck", "post"])(
+  "cancels the %s stage and clears its deadline",
+  async (stage) => {
+    vi.useFakeTimers();
+    const controller = new AbortController();
+    let markStarted!: () => void;
+    const started = new Promise<void>((resolve) => { markStarted = resolve; });
+    const fetchMock = vi.fn();
+    if (stage === "post") fetchMock.mockResolvedValueOnce(response(openQuiz));
+    fetchMock.mockImplementationOnce(() => {
+      markStarted();
+      return new Promise(() => {});
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const expectation = expect(
+      studentApi.submitIfUnsubmitted("quiz-1", { answers: [] }, controller.signal),
+    ).rejects.toMatchObject({ name: "AbortError" });
+    await started;
+    controller.abort();
+    await expectation;
+    const calls = fetchMock.mock.calls;
+    expect(calls).toHaveLength(stage === "precheck" ? 1 : 2);
+    expect(calls.at(-1)?.[1].signal.aborted).toBe(true);
+    expect(vi.getTimerCount()).toBe(0);
+  },
+);
+
+it.each(["precheck", "post"])(
+  "bounds %s response-body reads and stops subsequent work",
+  async (stage) => {
+    vi.useFakeTimers();
+    const fetchMock = vi.fn();
+    if (stage === "post") fetchMock.mockResolvedValueOnce(response(openQuiz));
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: stage === "precheck" ? 200 : 201,
+      text: () => new Promise(() => {}),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const expectation = expect(
+      studentApi.submitIfUnsubmitted("quiz-1", { answers: [] }),
+    ).rejects.toThrow(stage === "precheck" ? "too long to respond" : "may already have been received");
+    await vi.advanceTimersByTimeAsync(15_000);
+    await expectation;
+    const calls = fetchMock.mock.calls;
+    expect(calls).toHaveLength(stage === "precheck" ? 1 : 2);
+    expect(calls.at(-1)?.[1].signal.aborted).toBe(true);
+    expect(vi.getTimerCount()).toBe(0);
+  },
+);
