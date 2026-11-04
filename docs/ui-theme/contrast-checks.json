@@ -1,0 +1,80 @@
+[
+  {
+    "label": "Body",
+    "foreground": "color-text",
+    "background": "color-page",
+    "ratio": 18.97
+  },
+  {
+    "label": "Muted on page",
+    "foreground": "color-text-muted",
+    "background": "color-page",
+    "ratio": 5.57
+  },
+  {
+    "label": "Muted on white",
+    "foreground": "color-text-muted",
+    "background": "color-surface",
+    "ratio": 5.74
+  },
+  {
+    "label": "Muted on sage",
+    "foreground": "color-text-muted",
+    "background": "color-surface-sage",
+    "ratio": 5.41
+  },
+  {
+    "label": "Primary button",
+    "foreground": "color-on-primary",
+    "background": "color-primary",
+    "ratio": 9.87
+  },
+  {
+    "label": "Secondary button",
+    "foreground": "color-text",
+    "background": "color-surface",
+    "ratio": 21.0
+  },
+  {
+    "label": "Dark button",
+    "foreground": "color-on-dark",
+    "background": "color-dark",
+    "ratio": 12.82
+  },
+  {
+    "label": "Disabled button",
+    "foreground": "color-dark",
+    "background": "color-secondary-edge",
+    "ratio": 9.2
+  },
+  {
+    "label": "Link on page",
+    "foreground": "color-link",
+    "background": "color-page",
+    "ratio": 5.07
+  },
+  {
+    "label": "Success badge",
+    "foreground": "color-success",
+    "background": "color-surface-sage",
+    "ratio": 4.63
+  },
+  {
+    "label": "Error message",
+    "foreground": "color-error",
+    "background": "color-surface",
+    "ratio": 5.62
+  },
+  {
+    "label": "Neutral badge",
+    "foreground": "color-text-muted",
+    "background": "color-surface-soft",
+    "ratio": 5.69
+  },
+  {
+    "label": "Field placeholder",
+    "foreground": "color-text-muted",
+    "background": "color-surface-soft",
+    "ratio": 5.69
+  }
+]

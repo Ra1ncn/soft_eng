@@ -1,0 +1,50 @@
+[
+  {
+    "route": "/",
+    "heading": "Small questions.Big discoveries.",
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "route": "/teacher",
+    "heading": "Make room fora good question.",
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "route": "/student",
+    "heading": "A fresh question.A new perspective.",
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "route": "/ui-preview",
+    "heading": "Good ideas, in good company.",
+    "scrollWidth": 390,
+    "width": 390
+  },
+  {
+    "route": "/",
+    "heading": "Small questions.Big discoveries.",
+    "scrollWidth": 1280,
+    "width": 1280
+  },
+  {
+    "route": "/teacher",
+    "heading": "Make room fora good question.",
+    "scrollWidth": 1280,
+    "width": 1280
+  },
+  {
+    "route": "/student",
+    "heading": "A fresh question.A new perspective.",
+    "scrollWidth": 1280,
+    "width": 1280
+  },
+  {
+    "route": "/ui-preview",
+    "heading": "Good ideas, in good company.",
+    "scrollWidth": 1280,
+    "width": 1280
+  }
+]

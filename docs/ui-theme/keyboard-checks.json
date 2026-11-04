@@ -1,0 +1,11 @@
+{
+  "buttonFeedback": "Changes saved in this preview only.",
+  "checkboxAfterSpace": {
+    "ideas": true,
+    "patterns": false
+  },
+  "focusOutline": "rgb(27, 116, 104) solid 3px",
+  "radioAfterDown": "ask",
+  "textInput": "Keyboard tested title",
+  "textarea": "Typed using the keyboard."
+}

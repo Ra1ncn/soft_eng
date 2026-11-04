@@ -102,3 +102,7 @@ schema 变更统一请 A 完成或 review。拉取最新 main 后再生成新 mi
 ## 实际验证与附件修正
 
 完整命令、实际结果、版本、局限及附件修正见 [docs/validation.md](docs/validation.md)。附件原稿备份位于 [docs/reference/A_Task_Guide_ZH.md](docs/reference/A_Task_Guide_ZH.md)，它是未运行草稿；冲突时以本次用户要求及最终接口契约为准。
+
+## 前端视觉系统
+
+统一主题、组件接口、B/C 使用示例和实际验证见 [docs/ui-theme.md](docs/ui-theme.md)。运行前端后访问 `/ui-preview` 查看所有组件、表单及状态。界面默认使用英文，字体通过 Fontsource 自托管。
