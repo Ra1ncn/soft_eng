@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import type { CreateQuizRequest, CreateQuizResponse, QuestionType } from "@quiz/shared";
-import { AnswerOption, Button, ButtonLink, Card, Icon, QuestionNav, StatusBadge, TextInput, Textarea } from "../../components/ui/index.ts";
+import { AnswerOption, Button, ButtonLink, Card, Icon, QuestionNav, Select, StatusBadge, TextInput, Textarea, type SelectOption } from "../../components/ui/index.ts";
 import { apiFetch, ApiFetchError } from "../../lib/apiFetch.ts";
 import entryStyles from "../EntryPage.module.css";
 import styles from "./TeacherPage.module.css";
@@ -10,9 +10,9 @@ import {
   type FieldErrors, type QuestionDraft, type QuizDraft,
 } from "./quizDraft.ts";
 
-const questionTypes: { type: QuestionType; label: string; description: string }[] = [
-  { type: "SINGLE_CHOICE", label: "Single choice", description: "One correct answer" },
-  { type: "MULTIPLE_SELECT", label: "Multiple select", description: "One or more correct answers" },
+const questionTypes: SelectOption<QuestionType>[] = [
+  { value: "SINGLE_CHOICE", label: "Single choice" },
+  { value: "MULTIPLE_SELECT", label: "Multiple select" },
 ];
 
 const questionTargetId = (question: QuestionDraft) => `question-${question.key}`;
@@ -38,12 +38,6 @@ function QuestionCard({ question, index, canRemove, errors, onChange }: Question
       <Button className={styles.iconButton} variant="secondary" disabled={!canRemove} aria-label={`Remove question ${number}`} onClick={() => onChange((draft) => removeQuestion(draft, question.key))}><Icon name="trash" className={styles.removeIcon} /></Button>
     </div>
     <Textarea label="Question text" rows={2} required value={question.prompt} error={errors[`questions.${index}.prompt`]} onChange={(event) => { const { value } = event.target; onChange((draft) => setPrompt(draft, question.key, value)); }} />
-    <fieldset className={styles.group}>
-      <legend>Question type</legend>
-      <div className={styles.typeGrid}>
-        {questionTypes.map(({ type, label, description }) => <AnswerOption key={type} type="radio" name={`${question.key}-type`} value={type} label={label} description={description} checked={question.type === type} onChange={() => onChange((draft) => setQuestionType(draft, question.key, type))} />)}
-      </div>
-    </fieldset>
     <fieldset className={styles.group} aria-describedby={optionsError ? optionsErrorId : undefined}>
       <legend>Options</legend>
       <p className={styles.hint}>{question.type === "SINGLE_CHOICE" ? "Mark the one correct option." : "Mark every correct option."}</p>
@@ -56,7 +50,10 @@ function QuestionCard({ question, index, canRemove, errors, onChange }: Question
         </div>;
       })}
       {optionsError && <p id={optionsErrorId} className={styles.error}>{optionsError}</p>}
-      <div><Button variant="secondary" onClick={() => onChange((draft) => addOption(draft, question.key))}><Icon name="plus" /> Add option</Button></div>
+      <div className={styles.optionActions}>
+        <Button variant="secondary" onClick={() => onChange((draft) => addOption(draft, question.key))}><Icon name="plus" /> Add option</Button>
+        <Select aria-label={`Type of question ${number}`} value={question.type} options={questionTypes} onChange={(type) => onChange((draft) => setQuestionType(draft, question.key, type))} />
+      </div>
     </fieldset>
   </Card>;
 }

@@ -6,7 +6,7 @@
 .cardHeading h2 { font-size: 28px; }
 .group { display: grid; gap: var(--space-4); min-width: 0; padding: 0; border: 0; margin: 0; }
 .group legend { font-weight: 600; padding: 0; margin-bottom: var(--space-2); }
-.typeGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+.optionActions { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); padding-bottom: var(--space-1); }
 .hint { color: var(--color-text-muted); font-size: 14px; }
 .optionRow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: start; gap: var(--space-3); }
 /* Lines the controls up with the input, below the field label. */
@@ -28,7 +28,7 @@ button:disabled .removeIcon { color: inherit; }
   .layout { grid-template-columns: minmax(0, 1fr); }
   /* Clears the question strip, which stays stuck to the top of the screen. */
   .questionCard { scroll-margin-top: 80px; }
-  .typeGrid { grid-template-columns: 1fr; }
+  .optionActions > * { flex: 1 1 auto; }
   .optionRow { grid-template-columns: minmax(0, 1fr) auto; }
   .optionRow > :first-child { grid-column: 1 / -1; }
   .correct, .removeOption { margin-top: 0; }
