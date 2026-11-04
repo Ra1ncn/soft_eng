@@ -2,7 +2,7 @@
 
 React / TypeScript / Vite + Express / Zod + PostgreSQL / Prisma，使用 npm workspaces。A 提供平台基础、数据库和接口契约，方便 B、C、D 在同一仓库并行开发。
 
-当前只实现数据库健康检查及入口占位页。创建、列表、详情、提交四个业务接口均为空路由，目前返回统一 404，约定见 [docs/api.md](docs/api.md)。没有登录、评分、截止时间、发布状态、访问码或 AI 功能。
+当前已实现 A 的数据库健康检查，以及 C 的学生列表、作答页面和两个查询接口。学生端读取真实数据库，支持单选、多选、草稿和提交确认。B 的创建功能在尚未合并的 PR #4 中；本分支的创建接口和 D 的提交接口仍为空路由，返回统一 404。提交成功页面已按共享响应接好，但真实提交持久化仍需 D 完成。接口约定见 [docs/api.md](docs/api.md)，C 的范围、操作与交接见 [docs/student.md](docs/student.md)。没有真实登录、评分、截止时间、发布状态、访问码或 AI 功能。
 
 ## 环境与首次启动
 
@@ -25,7 +25,7 @@ npm run dev
 
 `nvm` 是可选的 Node 版本管理器，未安装时自行安装匹配版本的 Node。依赖安装与复制 `.env` 后，所有 Prisma 命令都从**根目录**运行；无需进入 server。首次等待数据库就绪，可运行 `docker compose ps`（db 为 healthy）或 `docker compose up -d --wait`。迁移失败应先确认 Docker 和端口，不要删除数据卷。
 
-- 首页：<http://localhost:5173/>；教师入口：<http://localhost:5173/teacher>；学生入口：<http://localhost:5173/student>。
+- 首页：<http://localhost:5173/>；教师入口：<http://localhost:5173/teacher>；学生入口：<http://localhost:5173/student>；示例作答页：<http://localhost:5173/student/quizzes/quiz-demo>。
 - 后端：<http://localhost:3001/api/health>。Vite 把 `/api` 代理到后端；无需跨域配置。
 - `npm run dev` 同时运行前后端，Ctrl+C 停止两者。
 - 默认前端 5173、后端 3001、数据库 5432，均通过根目录 `.env` 配置。
@@ -47,9 +47,9 @@ Prisma Studio 打开其终端给出的地址，选择 `Quiz` 表并筛选 `id = 
 
 ```text
 client/src/pages/teacher/           B：教师页面占位
-client/src/pages/student/           C：学生页面占位；D：提交成功状态
+client/src/pages/student/           C：列表、搜索、作答、草稿、提交确认及成功/失败状态
 client/src/lib/apiFetch.ts          演示身份请求封装
-server/src/modules/quizzes/         B：创建接口；C：列表和详情（空路由）
+server/src/modules/quizzes/         B：创建接口待合并；C：列表和详情已实现
 server/src/modules/submissions/     D：提交接口（空路由，mergeParams 已启用）
 server/src/auth/getCurrentUser.ts   从 X-Demo-Role 获取 seed 用户
 server/src/lib/prisma.ts            Prisma Client 单例
@@ -64,7 +64,7 @@ prisma.config.ts                   根目录 Prisma 路径与 seed 配置
 
 后端在 Express 5 异步路由中调用 `getCurrentUser(req)`，检查 user.role，不允许的角色抛出 `new AppError("FORBIDDEN", "身份没有权限")`。再使用 `CreateQuizRequest.parse(req.body)` 或 `SubmitRequest.parse(req.body)`；Zod 错误会转为 400，fields 使用点分路径。数据库错误只向客户端返回通用 500。500 的原始错误只写入服务端日志，不返回客户端；400、403、404 不写入错误日志。
 
-前端示例（供 B/C/D 接入业务页面，不代表接口已实现）：
+前端请求示例（各接口当前状态见 docs/api.md）：
 
 ```ts
 import type { QuizListResponse } from "@quiz/shared";
@@ -100,10 +100,10 @@ schema 变更统一请 A 完成或 review。拉取最新 main 后再生成新 mi
 ## B、C、D 接手
 
 - **B**：在 `client/src/pages/teacher/` 完成创建页；在 quizzes 路由添加 POST `/`。使用 TEACHER、共享请求校验，服务端按数组生成 position，并保存正确答案。
-- **C**：在 `client/src/pages/student/` 完成列表和作答页；在 quizzes 路由添加 GET `/`、GET `/:quizId`。只允许 STUDENT；显式 select 不含 isCorrect，按 position 排序。
-- **D**：在 submissions 路由添加 POST `/`，`req.params.quizId` 来自 mergeParams。只允许 STUDENT；验证归属、重复和单选限制，在事务中存所有题的答案（含未答），处理提交唯一约束并返回原有记录；接入提交成功状态。
+- **C**：已完成 `client/src/pages/student/` 的列表、搜索和作答页，以及 quizzes 路由 GET `/`、GET `/:quizId`。只允许 STUDENT；显式 select 不含 isCorrect，按 position 排序。提交前后状态已就绪，真实保存等待 D；详见 [docs/student.md](docs/student.md)。
+- **D**：在 submissions 路由添加 POST `/`，`req.params.quizId` 来自 mergeParams。只允许 STUDENT；验证归属、重复和单选限制，在事务中存所有题的答案（含未答），处理提交唯一约束并返回原有记录；返回共享 `SubmitResponse` 即可驱动 C 已有的成功状态。
 
-三位各自从最新 main 创建功能分支，不在共享工作分支同时提交。C 可先用 docs 中的固定 ID 写 mock，D 可基于 seed 测试事务。共享契约或 schema 修改请与 A 对齐。另需组长邀请余下成员、设置 main 保护、分配 PR review，并让至少一位组员从零实际启动；这些人工验收尚不能由 A 代替。
+组员各自从最新 main 创建功能分支，不在共享工作分支同时提交。C 已用真实 seed 数据验证查询；D 可基于 seed 测试事务。B 的 PR #4 是独立的待合并工作，本说明不执行或要求自动合并。共享契约或 schema 修改请与 A 对齐。另需组长邀请余下成员、设置 main 保护、分配 PR review，并让至少一位组员从零实际启动；这些人工验收尚不能由 A 代替。
 
 ## 实际验证与附件修正
 

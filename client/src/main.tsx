@@ -9,13 +9,14 @@ import { PageShell, ButtonLink } from "./components/ui/index.ts";
 import { HomePage } from "./pages/HomePage.tsx";
 import { TeacherPage } from "./pages/teacher/TeacherPage.tsx";
 import { StudentPage } from "./pages/student/StudentPage.tsx";
+import { StudentQuizPage } from "./pages/student/StudentQuizPage.tsx";
 import { UiPreviewPage } from "./pages/UiPreviewPage.tsx";
 import "./styles/tokens.css";
 import "./styles/global.css";
 
 createRoot(document.getElementById("root")!).render(<StrictMode><BrowserRouter><PageShell>
   <Routes><Route path="/" element={<HomePage />} /><Route path="/teacher" element={<TeacherPage />} />
-    <Route path="/student" element={<StudentPage />} />{import.meta.env.DEV && <Route path="/ui-preview" element={<UiPreviewPage />} />}
+    <Route path="/student" element={<StudentPage />} /><Route path="/student/quizzes/:quizId" element={<StudentQuizPage />} />{import.meta.env.DEV && <Route path="/ui-preview" element={<UiPreviewPage />} />}
     <Route path="*" element={<><h1>That page is still a mystery.</h1><p>Let’s find our way back.</p><ButtonLink to="/">Back to home</ButtonLink></>} />
   </Routes>
 </PageShell></BrowserRouter></StrictMode>);

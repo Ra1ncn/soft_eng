@@ -1,0 +1,333 @@
+.stack {
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+}
+.sectionTitle {
+  font-size: 32px;
+}
+.hint {
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+.listToolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+.listToolbar .hint {
+  margin-top: var(--space-2);
+}
+.search {
+  max-width: 480px;
+}
+.quizCard {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-5);
+}
+.symbol {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-card);
+  background: var(--color-surface-sage);
+  flex-shrink: 0;
+}
+.symbol svg {
+  width: 28px;
+  height: 28px;
+}
+.quizCopy {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.quizCopy h2 {
+  font-size: 28px;
+  overflow-wrap: anywhere;
+}
+.stateCard {
+  display: grid;
+  gap: var(--space-5);
+}
+.stateCard h2 {
+  font-size: 32px;
+  overflow-wrap: anywhere;
+}
+.stateCard > p {
+  max-width: 640px;
+  color: var(--color-text-muted);
+}
+.loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--color-text-muted);
+}
+.answerLayout {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-3);
+}
+.questionNav {
+  position: sticky;
+  top: var(--space-4);
+  align-self: start;
+  padding-right: var(--space-3);
+}
+.questionNav > p {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  margin-bottom: var(--space-3);
+}
+.questionNav > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.questionNav button {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+.questionNav button:hover {
+  border-color: var(--color-link);
+}
+.questionNav button.answered {
+  background: var(--color-surface-sage);
+  border-color: var(--color-link);
+}
+.questionNav button svg {
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  bottom: 2px;
+  right: 3px;
+}
+.progressCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+.progressCard h2 {
+  font-size: 24px;
+  margin-bottom: var(--space-2);
+}
+.progress {
+  width: 220px;
+  max-width: 100%;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-sage);
+  overflow: hidden;
+}
+.progress > span {
+  display: block;
+  height: 100%;
+  background: var(--color-link);
+  border-radius: inherit;
+  transition: width 150ms ease;
+}
+.questionCard {
+  scroll-margin-top: var(--space-5);
+}
+.questionCard:focus {
+  outline: var(--focus-ring);
+  outline-offset: 4px;
+}
+.group {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  margin: 0;
+}
+.cardHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+.cardHeading h2 {
+  font-size: 28px;
+}
+.prompt {
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: normal;
+  overflow-wrap: anywhere;
+}
+.options {
+  display: grid;
+  gap: var(--space-3);
+}
+.options label {
+  overflow-wrap: anywhere;
+}
+.formFooter {
+  display: grid;
+  gap: var(--space-4);
+  padding-inline: calc(var(--space-6) + 1px);
+}
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding-bottom: var(--space-1);
+}
+.formActions {
+  justify-content: space-between;
+}
+.error {
+  color: var(--color-error);
+  font-size: 14px;
+}
+.dialog {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100svh - 32px);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+.dialog::backdrop {
+  background: var(--color-text-muted);
+}
+.dialog h2 {
+  font-size: 32px;
+}
+.dialog .actions {
+  margin-top: var(--space-2);
+}
+.dialog [role="status"] {
+  justify-self: start;
+}
+.receipt {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+}
+.receipt > div {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: var(--space-3);
+}
+.receipt dt {
+  color: var(--color-text-muted);
+}
+.receipt dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.receipt code {
+  font-size: 14px;
+}
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (max-width: 700px) {
+  .quizCard {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+  .quizCard > a {
+    grid-column: 1 / -1;
+  }
+  .quizCard .symbol {
+    width: 48px;
+    height: 48px;
+  }
+  .quizCopy h2 {
+    font-size: 26px;
+  }
+  .answerLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .questionNav {
+    z-index: 1;
+    top: 0;
+    padding: var(--space-3) 0;
+    background: var(--color-page);
+    margin-top: calc(-1 * var(--space-3));
+  }
+  .questionNav > p {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .questionNav > div {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: var(--space-1);
+  }
+  .questionNav button {
+    flex-shrink: 0;
+  }
+  .questionCard {
+    scroll-margin-top: 84px;
+  }
+  .progressCard {
+    gap: var(--space-4);
+  }
+  .progress {
+    width: 100%;
+  }
+  .actions {
+    justify-content: stretch;
+  }
+  .actions > * {
+    flex: 1 1 auto;
+  }
+  .prompt {
+    font-size: 18px;
+  }
+  .receipt > div {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+  .listToolbar {
+    align-items: stretch;
+  }
+  .dialog .actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}
+@media (max-width: 600px) {
+  .formFooter {
+    padding-inline: calc(var(--space-5) + 1px);
+  }
+  .dialog {
+    padding: var(--space-5);
+  }
+}

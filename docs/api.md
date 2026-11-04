@@ -1,7 +1,7 @@
 # 第一阶段 API 约定
 
 本文件是 B、C、D 的接口标准，与 `shared/contracts.ts` 同步维护。
-当前 A 只实现 `GET /api/health`；下列四个业务接口**尚未实现**，现请求会落入统一 404。表中的权限、成功响应及业务错误是 B、C、D 的实现要求，不能视为已完成接口。
+当前已实现 A 的 `GET /api/health` 和 C 的两个学生查询接口。B 的创建接口位于尚未合并的 PR #4；本分支的创建接口及 D 的提交接口仍为空路由，返回统一 404。下表区分当前实现状态；未实现接口的权限、成功响应及业务错误仍是后续实现要求。C 的学生页面、验证范围和提交交接见 [student.md](student.md)。
 
 ## 通用规则
 
@@ -15,13 +15,13 @@
 - 标题、题干、选项文本及提交 ID 会 trim；Zod 普通对象会去除未声明字段，调用方不应发送这些字段。
 - 题目和选项 `position` 从 0 开始，按创建请求数组顺序生成；读取按 `position` 升序。
 
-| 方法与路径 | 负责人 | 允许身份 | 成功状态 | 共享响应 |
-| --- | --- | --- | --- | --- |
-| `GET /api/health` | A，已实现 | 无需身份 | 200 | `HealthResponse` |
-| `POST /api/quizzes` | B | TEACHER | 201 | `CreateQuizResponse` |
-| `GET /api/quizzes` | C | STUDENT（老师返回 403） | 200 | `QuizListResponse` |
-| `GET /api/quizzes/:quizId` | C | STUDENT（老师返回 403） | 200 | `QuizDetailResponse` |
-| `POST /api/quizzes/:quizId/submissions` | D | STUDENT（老师返回 403） | 首次 201，重复 200 | `SubmitResponse` |
+| 方法与路径 | 负责人 | 当前状态 | 允许身份 | 成功状态 | 共享响应 |
+| --- | --- | --- | --- | --- | --- |
+| `GET /api/health` | A | 已实现 | 无需身份 | 200 | `HealthResponse` |
+| `POST /api/quizzes` | B | 本分支未实现；PR #4 待合并 | TEACHER | 201 | `CreateQuizResponse` |
+| `GET /api/quizzes` | C | 已实现 | STUDENT（老师返回 403） | 200 | `QuizListResponse` |
+| `GET /api/quizzes/:quizId` | C | 已实现 | STUDENT（老师返回 403） | 200 | `QuizDetailResponse` |
+| `POST /api/quizzes/:quizId/submissions` | D | 未实现 | STUDENT（老师返回 403） | 首次 201，重复 200 | `SubmitResponse` |
 
 ## 统一错误
 
