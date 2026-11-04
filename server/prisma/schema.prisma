@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  TEACHER
+  STUDENT
+}
+
+enum QuestionType {
+  SINGLE_CHOICE
+  MULTIPLE_SELECT
+}
+
+model User {
+  id          String       @id @default(cuid())
+  name        String
+  email       String       @unique
+  role        Role
+  createdAt   DateTime     @default(now())
+  quizzes     Quiz[]
+  submissions Submission[]
+}
+
+model Quiz {
+  id          String       @id @default(cuid())
+  title       String
+  teacherId   String
+  teacher     User         @relation(fields: [teacherId], references: [id])
+  createdAt   DateTime     @default(now())
+  questions   Question[]
+  submissions Submission[]
+}
+
+model Question {
+  id       String             @id @default(cuid())
+  quizId   String
+  quiz     Quiz               @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  position Int
+  prompt   String
+  type     QuestionType
+  options  Option[]
+  answers  SubmissionAnswer[]
+
+  @@unique([quizId, position])
+}
+
+model Option {
+  id         String             @id @default(cuid())
+  questionId String
+  question   Question           @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  position   Int
+  text       String
+  isCorrect  Boolean            @default(false)
+  selectedIn SubmissionAnswer[]
+
+  @@unique([questionId, position])
+}
+
+model Submission {
+  id          String             @id @default(cuid())
+  quizId      String
+  quiz        Quiz               @relation(fields: [quizId], references: [id])
+  studentId   String
+  student     User               @relation(fields: [studentId], references: [id])
+  submittedAt DateTime           @default(now())
+  answers     SubmissionAnswer[]
+
+  @@unique([quizId, studentId])
+}
+
+model SubmissionAnswer {
+  id              String     @id @default(cuid())
+  submissionId    String
+  submission      Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  questionId      String
+  question        Question   @relation(fields: [questionId], references: [id])
+  selectedOptions Option[]
+
+  @@unique([submissionId, questionId])
+}
