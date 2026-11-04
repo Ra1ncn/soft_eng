@@ -1,11 +1,11 @@
 import { useState, type FormEvent } from "react";
 import type { CreateQuizRequest, CreateQuizResponse, QuestionType } from "@quiz/shared";
-import { AnswerOption, Button, ButtonLink, Card, Icon, StatusBadge, TextInput, Textarea } from "../../components/ui/index.ts";
+import { AnswerOption, Button, ButtonLink, Card, Icon, QuestionNav, StatusBadge, TextInput, Textarea } from "../../components/ui/index.ts";
 import { apiFetch, ApiFetchError } from "../../lib/apiFetch.ts";
 import entryStyles from "../EntryPage.module.css";
 import styles from "./TeacherPage.module.css";
 import {
-  addOption, addQuestion, createDraft, describeFields, MIN_OPTIONS, MIN_QUESTIONS, removeOption, removeQuestion,
+  addOption, addQuestion, createDraft, describeFields, MIN_OPTIONS, MIN_QUESTIONS, questionHasError, removeOption, removeQuestion,
   setOptionCorrect, setOptionText, setPrompt, setQuestionType, toCreateRequest, validateDraft,
   type FieldErrors, type QuestionDraft, type QuizDraft,
 } from "./quizDraft.ts";
@@ -14,6 +14,8 @@ const questionTypes: { type: QuestionType; label: string; description: string }[
   { type: "SINGLE_CHOICE", label: "Single choice", description: "One correct answer" },
   { type: "MULTIPLE_SELECT", label: "Multiple select", description: "One or more correct answers" },
 ];
+
+const questionTargetId = (question: QuestionDraft) => `question-${question.key}`;
 
 const saveQuiz = (body: CreateQuizRequest) =>
   apiFetch<CreateQuizResponse>("/api/quizzes", "TEACHER", { method: "POST", body: JSON.stringify(body) });
@@ -30,7 +32,7 @@ function QuestionCard({ question, index, canRemove, errors, onChange }: Question
   const number = index + 1;
   const optionsError = errors[`questions.${index}.options`];
   const optionsErrorId = `${question.key}-options-error`;
-  return <Card className={styles.stack}>
+  return <Card id={questionTargetId(question)} tabIndex={-1} className={`${styles.stack} ${styles.questionCard}`}>
     <div className={styles.cardHeading}>
       <h2><span className={styles.visuallyHidden}>Question </span>{number}.</h2>
       <Button className={styles.iconButton} variant="secondary" disabled={!canRemove} aria-label={`Remove question ${number}`} onClick={() => onChange((draft) => removeQuestion(draft, question.key))}><Icon name="trash" className={styles.removeIcon} /></Button>
@@ -126,6 +128,8 @@ export function TeacherPage() {
   }
 
   return <>{header("Create a quiz.", "Add your questions, mark the correct answers, and save when you’re ready.")}
+    <div className={styles.layout}>
+    <QuestionNav items={draft.questions.map((question, index) => ({ targetId: questionTargetId(question), hasError: questionHasError(errors, index) }))} />
     <form className={styles.form} onSubmit={handleSubmit} noValidate>
       <Card>
         <TextInput label="Quiz title" required placeholder="Give your quiz a name" value={draft.title} error={errors.title} onChange={(event) => { const title = event.target.value; change((current) => ({ ...current, title })); }} />
@@ -142,5 +146,6 @@ export function TeacherPage() {
         </div>
       </div>
     </form>
+    </div>
     {footer}</>;
 }

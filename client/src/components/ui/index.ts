@@ -7,3 +7,4 @@ export { StatusBadge } from "./StatusBadge.tsx";
 export { PageShell } from "./PageShell.tsx";
 export { TopNav } from "./TopNav.tsx";
 export { Icon } from "./Icon.tsx";
+export { QuestionNav, type QuestionNavItem } from "./QuestionNav.tsx";

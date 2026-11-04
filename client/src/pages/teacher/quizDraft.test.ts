@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CreateQuizRequest } from "@quiz/shared";
 import {
-  addOption, addQuestion, createDraft, describeFields, removeOption, removeQuestion, setOptionCorrect,
+  addOption, addQuestion, createDraft, describeFields, questionHasError, removeOption, removeQuestion, setOptionCorrect,
   setOptionText, setPrompt, setQuestionType, toCreateRequest, validateDraft, type QuizDraft,
 } from "./quizDraft.ts";
 
@@ -132,6 +132,21 @@ describe("validation", () => {
       "questions.0.options.1.text": "Add the option text.",
       unknown: "Check this field and try again.",
     });
+  });
+});
+
+describe("questionHasError", () => {
+  it("matches errors on the question and its options only", () => {
+    const errors = { title: "x", "questions.1.prompt": "x", "questions.2.options": "x", "questions.3.options.0.text": "x" };
+    expect([0, 1, 2, 3].map((index) => questionHasError(errors, index))).toEqual([false, true, true, true]);
+  });
+
+  it("does not confuse question 1 with question 10", () => {
+    expect(questionHasError({ "questions.10.prompt": "x" }, 1)).toBe(false);
+  });
+
+  it("ignores the title and the question list", () => {
+    expect(questionHasError({ title: "x", questions: "x" }, 0)).toBe(false);
   });
 });
 

@@ -90,6 +90,9 @@ export function describeFields(paths: string[], draft: QuizDraft): FieldErrors {
   return Object.fromEntries(paths.map((path) => [path, describeField(path, draft)]));
 }
 
+export const questionHasError = (errors: FieldErrors, index: number) =>
+  Object.keys(errors).some((path) => path.startsWith(`questions.${index}.`));
+
 export function validateDraft(draft: QuizDraft): FieldErrors {
   const result = CreateQuizRequest.safeParse(toCreateRequest(draft));
   if (result.success) return {};
