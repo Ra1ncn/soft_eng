@@ -60,7 +60,7 @@ docs/api.md                        接口唯一标准，改动须同步共享契
 prisma.config.ts                   根目录 Prisma 路径与 seed 配置
 ```
 
-`@quiz/shared` 直接导出 TypeScript 源码，本地由 Vite/tsx 处理，无需单独构建共享包。Prisma 7 用 `prisma-client` 生成器及 PostgreSQL adapter，客户端生成至忽略的 `server/src/generated/prisma/`，不要提交生成代码。`npm run typecheck`、`npm test`、`npm run dev` 会先生成客户端。
+`@quiz/shared` 直接导出 TypeScript 源码，本地由 Vite/tsx 处理，无需单独构建共享包。Prisma 7 用 `prisma-client` 生成器及 PostgreSQL adapter，客户端生成至忽略的 `server/src/generated/prisma/`，不要提交生成代码。Prisma 7 的 `migrate dev` 不自动生成客户端，因此 seed 命令先执行 `prisma generate`；`npm run typecheck`、`npm test`、`npm run dev` 也会先生成客户端。
 
 后端在 Express 5 异步路由中调用 `getCurrentUser(req)`，检查 user.role，不允许的角色抛出 `new AppError("FORBIDDEN", "身份没有权限")`。再使用 `CreateQuizRequest.parse(req.body)` 或 `SubmitRequest.parse(req.body)`；Zod 错误会转为 400，fields 使用点分路径。数据库错误只向客户端返回通用 500。
 
