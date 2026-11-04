@@ -18,7 +18,8 @@
     "test": "vitest run",
     "pretest": "prisma generate",
     "build": "npm run typecheck && npm run build -w client",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "db:seed": "prisma generate && tsx server/prisma/seed.ts"
   },
   "devDependencies": {
     "prisma": "7.10.1",
