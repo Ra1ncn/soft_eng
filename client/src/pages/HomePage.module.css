@@ -1,0 +1,41 @@
+.hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: 56px; align-items: center; }
+.intro { min-width: 0; }
+.eyebrow { display: flex; align-items: center; gap: 9px; margin-bottom: 25px; color: var(--color-text-muted); font-size: 13px; font-weight: 500; }
+.eyebrow > span { width: 7px; height: 7px; border-radius: 50%; background: var(--color-success); }
+.intro h1 { font-size: clamp(48px, 5.8vw, 76px); line-height: 1.03; }
+.intro h1 > span { color: var(--color-link); }
+.lead { max-width: 430px; color: var(--color-text-muted); margin-top: 24px; font-size: 18px; line-height: 1.65; }
+.actions { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 32px; padding-bottom: 4px; }
+.note { display: flex; align-items: center; gap: 9px; margin-top: 26px; color: var(--color-text-muted); font-size: 12px; }
+.note svg { width: 16px; height: 16px; flex-shrink: 0; }
+.art { padding: 26px; border: 1px solid var(--color-border); border-radius: var(--radius-card-large); background: var(--color-surface-sage); transform: rotate(2deg); }
+.artTop { display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 600; letter-spacing: .12em; }
+.artTop > svg { margin-left: auto; width: 18px; }
+.artDot { width: 6px; height: 6px; background: var(--color-text); border-radius: 50%; }
+.geometry { display: block; width: 100%; margin-block: 22px 14px; }
+.guides { stroke: var(--color-text-muted); stroke-dasharray: 2 6; stroke-width: .6; }
+.shapeSoft { fill: var(--color-surface-soft); }
+.shapeGreen { fill: var(--color-primary); }
+.shapeDark { fill: var(--color-dark); }
+.shapePage { fill: var(--color-page); }
+.shapeSage { fill: var(--color-surface-soft); stroke: var(--color-dark); stroke-width: 2; }
+.line { stroke: var(--color-text); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.spark { fill: var(--color-dark); }
+.artBottom { display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--color-surface); border-radius: var(--radius-control); }
+.artNumber { display: grid; place-items: center; flex: 0 0 34px; height: 34px; border: 1px solid var(--color-border); border-radius: 50%; color: var(--color-text-muted); font-size: 12px; }
+.artBottom > div { display: grid; font-size: 13px; }
+.artBottom strong { font-weight: 600; }
+.artBottom div span { color: var(--color-text-muted); font-size: 12px; }
+.artArrow { margin-left: auto; }
+.pathSection { margin-top: 96px; }
+.sectionHeading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 24px; }
+.sectionHeading h2 { font-size: 34px; }
+.sectionHeading p { max-width: 300px; color: var(--color-text-muted); font-size: 14px; }
+.paths { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.pathCard { position: relative; padding-right: 64px; box-shadow: none; }
+.step { display: block; color: var(--color-text-muted); font-size: 11px; letter-spacing: .12em; margin-bottom: 22px; }
+.pathCard > svg { position: absolute; top: 30px; right: 30px; width: 24px; height: 24px; }
+.pathCard h3 { margin-bottom: 10px; font-size: 19px; }
+.pathCard p { color: var(--color-text-muted); font-size: 14px; max-width: 360px; }
+@media (max-width: 850px) { .hero { grid-template-columns: 1fr; gap: 48px; } .intro { max-width: 620px; } .art { width: min(100% - 10px, 480px); margin-inline: auto; transform: none; } .intro h1 { font-size: clamp(48px, 9vw, 72px); } .sectionHeading { display: grid; gap: 12px; } }
+@media (max-width: 600px) { .eyebrow { font-size: 12px; margin-bottom: 22px; } .intro h1 { font-size: 48px; } .lead { font-size: 16px; } .actions { gap: 12px; } .actions > a { flex: 1; padding-inline: 18px; white-space: nowrap; } .art { padding: 22px; width: 100%; } .artBottom { padding: 12px; gap: 9px; } .artBottom > div { font-size: 12px; } .artBottom div span { font-size: 11px; } .pathSection { margin-top: 56px; } .sectionHeading h2 { font-size: 30px; } .paths { grid-template-columns: 1fr; } }
